@@ -1,0 +1,290 @@
+﻿import os
+import sys
+import asyncio
+import webbrowser
+import json
+import re
+from pathlib import Path
+from threading import Thread
+from datetime import datetime, timezone
+from flask import Flask, render_template
+from fastapi import FastAPI, Form, UploadFile, File
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
+from core.query import QueryManager
+from core.search import SearchTask, SearchResult
+from prompt.Upgrader import upg
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+for x in ["HTTP_PROXY","HTTPS_PROXY","ALL_PROXY","http_proxy","https_proxy","all_proxy"]:
+    os.environ.pop(x,None)
+
+os.environ["NO_PROXY"]="*"
+os.environ["no_proxy"]="*"
+
+BASE_DIR=Path(__file__).resolve().parent
+SKILLS_DIR=BASE_DIR/"skills"
+SKILLS_FILE=BASE_DIR/"skills.json"
+query_manager=QueryManager()
+
+SKILLS_DIR.mkdir(exist_ok=True)
+if not SKILLS_FILE.exists():
+    SKILLS_FILE.write_text("[]",encoding="utf-8")
+
+def now_iso():
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+def slugify(value):
+    value=str(value or "").strip().lower()
+    value=re.sub(r"[^a-z0-9а-яё_-]+","-",value,flags=re.I)
+    value=re.sub(r"-+","-",value).strip("-")
+    return value or "skill"
+
+def unique_filename(filename):
+    filename=str(filename or "skill.md")
+    stem=Path(filename).stem
+    ext=Path(filename).suffix or ".md"
+    base=f"{slugify(stem)}{ext}"
+    path=SKILLS_DIR/base
+    if not path.exists():
+        return base
+    i=2
+    while True:
+        candidate=f"{slugify(stem)}-{i}{ext}"
+        if not (SKILLS_DIR/candidate).exists():
+            return candidate
+        i+=1
+
+def load_skills():
+    try:
+        data=json.loads(SKILLS_FILE.read_text(encoding="utf-8"))
+        if isinstance(data,list):
+            return [x for x in data if isinstance(x,dict)]
+    except:
+        pass
+    return []
+
+def save_skills(skills):
+    SKILLS_FILE.write_text(json.dumps(skills,ensure_ascii=False,indent=2),encoding="utf-8")
+
+def first_line(text):
+    for line in str(text or "").splitlines():
+        line=line.strip()
+        if line:
+            return line[:240]
+    return ""
+
+def extract_tags(text):
+    tags=[]
+    for line in str(text or "").splitlines():
+        m=re.match(r"^\s*tags?\s*:\s*(.+)$",line,re.I)
+        if m:
+            tags=[x.strip() for x in re.split(r"[,;]",m.group(1)) if x.strip()]
+            break
+    return tags
+
+def skill_keys(skill):
+    keys=set()
+    name=slugify(skill.get("name",""))
+    if name:
+        keys.add(name)
+    filename=skill.get("filename","")
+    if filename:
+        keys.add(slugify(Path(filename).stem))
+    return keys
+
+def same_skill(a,b):
+    return bool(skill_keys(a)&skill_keys(b))
+
+def write_skill_file(filename,content):
+    path=SKILLS_DIR/filename
+    path.write_text(str(content or ""),encoding="utf-8")
+    return path
+
+def save_skill_payload(data,source="manual",filename=None):
+    name=str(data.get("name") or "").strip()
+    content=str(data.get("content") or "").strip()
+    if not content:
+        return None,"Skill content required"
+    if not name:
+        name=Path(filename).stem if filename else f"Навык {len(load_skills())+1}"
+    if not filename:
+        filename=unique_filename(f"{slugify(name)}.md")
+    record={
+        "name":name,
+        "filename":filename,
+        "content":content,
+        "description":str(data.get("description") or first_line(content)),
+        "tags":data.get("tags") if isinstance(data.get("tags"),list) else extract_tags(content),
+        "source":source,
+        "created_at":data.get("created_at") or now_iso(),
+        "updated_at":now_iso()
+    }
+    write_skill_file(filename,content)
+    skills=load_skills()
+    replaced=False
+    for i,skill in enumerate(skills):
+        if same_skill(skill,record):
+            record["created_at"]=skill.get("created_at",record["created_at"])
+            skills[i]=record
+            replaced=True
+            break
+    if not replaced:
+        skills.append(record)
+    save_skills(skills)
+    return record,None
+
+def delete_skill_by_id(skill_id):
+    skill_id=slugify(Path(skill_id).stem) if "." in skill_id else slugify(skill_id)
+    skills=load_skills()
+    kept=[]
+    removed=None
+    for skill in skills:
+        keys=skill_keys(skill)
+        if skill_id in keys:
+            removed=skill
+        else:
+            kept.append(skill)
+    if not removed:
+        return None
+    save_skills(kept)
+    filename=removed.get("filename")
+    if filename:
+        path=SKILLS_DIR/filename
+        if path.exists():
+            path.unlink()
+    return removed
+
+flask_app=Flask(__name__,template_folder="interface",static_folder="interface",static_url_path="")
+fastapi_app=FastAPI()
+fastapi_app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
+@flask_app.route("/")
+def index():
+    return render_template("index.html")
+
+@fastapi_app.get("/api/skills")
+async def get_skills():
+    return JSONResponse(content=load_skills())
+
+@fastapi_app.post("/api/skills")
+async def add_skill(request: dict):
+    skill,err=save_skill_payload(request,source="manual")
+    if err:
+        return JSONResponse(content={"status":"error","message":err},status_code=400)
+    return JSONResponse(content={"status":"success","message":"Skill saved","skill":skill})
+
+@fastapi_app.post("/api/skills/upload")
+async def upload_skill(file: UploadFile=File(...)):
+    raw=await file.read()
+    try:
+        text=raw.decode("utf-8",errors="ignore").strip()
+    except:
+        text=""
+    if not text:
+        return JSONResponse(content={"status":"error","message":"Empty file"},status_code=400)
+    original=file.filename or "skill.md"
+    filename=unique_filename(original)
+    skill,err=save_skill_payload(
+        {
+            "name":Path(original).stem,
+            "content":text,
+            "description":first_line(text),
+            "tags":extract_tags(text)
+        },
+        source="upload",
+        filename=filename
+    )
+    if err:
+        return JSONResponse(content={"status":"error","message":err},status_code=400)
+    return JSONResponse(content={"status":"success","message":"Uploaded","skill":skill})
+
+@fastapi_app.delete("/api/skills/{skill_id}")
+async def delete_skill(skill_id: str):
+    removed=delete_skill_by_id(skill_id)
+    if not removed:
+        return JSONResponse(content={"status":"error","message":"Skill not found"},status_code=404)
+    return JSONResponse(content={"status":"success","message":"Skill deleted"})
+
+@fastapi_app.post("/api/train")
+async def train_skill(request: dict):
+    skill,err=save_skill_payload(request,source="manual")
+    if err:
+        return JSONResponse(content={"status":"error","message":err},status_code=400)
+    return JSONResponse(content={"status":"success","message":"Skill saved","trained":False,"skill":skill})
+
+@flask_app.route("/api/train",methods=["POST"])
+def flask_train_skill():
+    data=request.json or {}
+    skill,err=save_skill_payload(data,source="manual")
+    if err:
+        return jsonify({"status":"error","message":err}),400
+    return jsonify({"status":"success","message":"Skill saved","trained":False,"skill":skill})
+
+@fastapi_app.post("/api/search")
+async def api_search(query: str = Form(...)):
+    try:
+        query_manager.set_query(query)
+        task=SearchTask()
+        upgraded=upg()
+        if not isinstance(upgraded,str):
+            if hasattr(upgraded,"text"):
+                upgraded=upgraded.text
+            elif hasattr(upgraded,"content"):
+                upgraded=str(upgraded.content)
+            else:
+                upgraded=str(upgraded)
+        task.search(query)
+        result=SearchResult().generate_result(task)
+        if not isinstance(result,str):
+            if hasattr(result,"text"):
+                result=result.text
+            elif hasattr(result,"content"):
+                result=str(result.content)
+            else:
+                result=str(result)
+        if not result:
+            result="No results found"
+        return JSONResponse(content={"query":upgraded,"result":result,"skills_used":len(task.relevant_skills)})
+    except Exception as e:
+        return JSONResponse(content={"error":str(e)},status_code=500)
+
+@fastapi_app.get("/api/health")
+async def health():
+    return {"status":"ok","service":"LLM-WIKI","skills_count":len(load_skills())}
+
+def run_flask():
+    flask_app.run(host="127.0.0.1",port=5000,debug=False,use_reloader=False)
+
+async def run_fastapi():
+    config=uvicorn.Config(fastapi_app,host="127.0.0.1",port=8000,log_level="info")
+    server=uvicorn.Server(config)
+    await server.serve()
+
+async def main():
+    print(f"""
+LLM-WIKI STARTED
+
+UI:
+http://127.0.0.1:5000
+
+API:
+http://127.0.0.1:8000
+
+DOCS:
+http://127.0.0.1:8000/docs
+""")
+    Thread(target=run_flask,daemon=True).start()
+    await asyncio.sleep(1)
+    webbrowser.open("http://127.0.0.1:5000")
+    await run_fastapi()
+
+if __name__=="__main__":
+    asyncio.run(main())

@@ -1,0 +1,13 @@
+flask
+fastapi
+uvicorn[standard]
+httpx
+python-dotenv
+qdrant-client
+fastembed
+beautifulsoup4
+googlesearch-python
+ddgs
+pywebview
+python-multipart
+requests

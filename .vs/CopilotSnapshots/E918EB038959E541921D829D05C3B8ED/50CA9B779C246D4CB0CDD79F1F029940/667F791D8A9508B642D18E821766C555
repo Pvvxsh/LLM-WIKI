@@ -1,0 +1,546 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM-WIKI</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .skills-panel {
+            position: fixed;
+            top: 0;
+            right: -420px;
+            width: 400px;
+            height: 100vh;
+            background: #faf8f3;
+            color: #4a4742;
+            padding: 25px;
+            box-shadow: -4px 0 20px rgba(0,0,0,.1);
+            transition: right .3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+            border-left: 1px solid #e8e2d8
+        }
+
+            .skills-panel.open {
+                right: 0
+            }
+
+            .skills-panel h2 {
+                font-size: 1.4rem;
+                font-weight: 400;
+                letter-spacing: 2px;
+                color: #5c574f;
+                border-bottom: 2px solid #d6d0c4;
+                padding-bottom: 15px;
+                margin-top: 0;
+                margin-bottom: 20px
+            }
+
+            .skills-panel .close-btn {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: none;
+                border: none;
+                color: #8a847b;
+                font-size: 28px;
+                cursor: pointer;
+                transition: color .2s;
+                line-height: 1
+            }
+
+                .skills-panel .close-btn:hover {
+                    color: #4a4742
+                }
+
+        .skill-item {
+            background: #f4efe6;
+            padding: 14px 18px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 3px solid #b5b0a6;
+            transition: background .2s
+        }
+
+            .skill-item:hover {
+                background: #ede7db
+            }
+
+            .skill-item .skill-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 6px;
+                gap: 10px
+            }
+
+            .skill-item .skill-name {
+                font-weight: 500;
+                color: #4a4742;
+                font-size: .95rem
+            }
+
+            .skill-item .skill-content {
+                font-size: .85rem;
+                color: #6b665e;
+                line-height: 1.6;
+                margin-top: 4px;
+                padding: 8px 12px;
+                background: #faf8f3;
+                border-radius: 6px;
+                border: 1px solid #e8e2d8;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                max-height: 120px;
+                overflow-y: auto
+            }
+
+            .skill-item .delete-btn {
+                background: #e8ddd0;
+                border: none;
+                color: #6b5a4a;
+                padding: 4px 14px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 13px;
+                transition: all .2s;
+                font-family: inherit
+            }
+
+                .skill-item .delete-btn:hover {
+                    background: #d6c8b8;
+                    color: #4a3a2a
+                }
+
+        .skills-panel .add-section {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+            .skills-panel .add-section textarea {
+                width: 100%;
+                padding: 14px 16px;
+                border-radius: 8px;
+                border: 1px solid #d6d0c4;
+                background: #faf8f3;
+                color: #4a4742;
+                font-size: .95rem;
+                font-family: inherit;
+                resize: vertical;
+                min-height: 100px;
+                transition: border-color .2s
+            }
+
+                .skills-panel .add-section textarea:focus {
+                    outline: none;
+                    border-color: #8a847b
+                }
+
+                .skills-panel .add-section textarea::placeholder {
+                    color: #b5b0a6
+                }
+
+            .skills-panel .add-section .button-row {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap
+            }
+
+            .skills-panel .add-section button {
+                padding: 12px 24px;
+                border: 1px solid #d6d0c4;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 500;
+                transition: all .2s;
+                font-family: inherit;
+                font-size: .95rem;
+                background: transparent;
+                color: #5c574f;
+                flex: 1
+            }
+
+            .skills-panel .add-section .save-btn {
+                background: #d6d0c4;
+                border-color: #c5beb1
+            }
+
+                .skills-panel .add-section .save-btn:hover {
+                    background: #c5beb1
+                }
+
+            .skills-panel .add-section .upload-btn {
+                background: #e8ddd0;
+                border-color: #cbbca8
+            }
+
+                .skills-panel .add-section .upload-btn:hover {
+                    background: #d9ccb9
+                }
+
+            .skills-panel .add-section .cancel-btn {
+                flex: .4
+            }
+
+                .skills-panel .add-section .cancel-btn:hover {
+                    background: #ede7db
+                }
+
+            .skills-panel .add-section .file-input {
+                width: 100%;
+                padding: 12px 14px;
+                border: 1px solid #d6d0c4;
+                border-radius: 8px;
+                background: #faf8f3;
+                color: #4a4742;
+                font-family: inherit
+            }
+
+        .skills-panel .empty-msg {
+            color: #b5b0a6;
+            text-align: center;
+            margin: 40px 0;
+            font-style: italic;
+            font-size: .95rem
+        }
+
+        .settings-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #f4efe6;
+            border: 1px solid #d6d0c4;
+            color: #5c574f;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 22px;
+            cursor: pointer;
+            z-index: 500;
+            box-shadow: 0 2px 10px rgba(0,0,0,.05);
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+            .settings-toggle:hover {
+                background: #ede7db;
+                transform: scale(1.03)
+            }
+
+            .settings-toggle svg {
+                width: 24px;
+                height: 24px;
+                fill: #5c574f
+            }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,.2);
+            z-index: 999
+        }
+
+            .overlay.active {
+                display: block
+            }
+
+        .panel-footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e8e2d8;
+            font-size: .85rem;
+            color: #8a847b
+        }
+
+        @media (max-width:500px) {
+            .skills-panel {
+                width: 100%;
+                right: -100%
+            }
+
+                .skills-panel .add-section .button-row {
+                    flex-direction: column
+                }
+
+                .skills-panel .add-section .cancel-btn {
+                    flex: 1
+                }
+        }
+    </style>
+</head>
+<body>
+    <button class="settings-toggle" id="settingsToggle" aria-label="Настройки навыков">
+        <svg viewBox="0 0 24 24">
+            <path d="M19.14 12.94a7.07 7.07 0 0 0 0-1.88l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.04 7.04 0 0 0-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84a.49.49 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87a.49.49 0 0 0 .12.61l2.03 1.58a7.07 7.07 0 0 0 0 1.88l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.49.37 1.03.7 1.62.94l.36 2.54c.05.24.26.41.48.41h3.84c.22 0 .43-.17.48-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 0 0-.12-.61l-2.03-1.58zM12 15.6A3.6 3.6 0 1 1 15.6 12 3.6 3.6 0 0 1 12 15.6z" />
+        </svg>
+    </button>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="skills-panel" id="skillsPanel">
+        <button class="close-btn" id="closePanel">&times;</button>
+        <h2>Управление навыками</h2>
+        <div id="skillsList"></div>
+        <div class="add-section">
+<textarea id="skillInput" placeholder="Вставь текст навыка сюда..."></textarea>
+            <input class="file-input" id="skillFile" type="file" accept=".md,.txt,.json,.skill">
+            <div class="button-row">
+                <button class="upload-btn" id="uploadSkill">Загрузить файл</button>
+                <button class="save-btn" id="saveSkill">Сохранить текст</button>
+                <button class="cancel-btn" id="cancelSkill">Очистить</button>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <span>Всего навыков: <span id="skillCount">0</span></span>
+        </div>
+    </div>
+
+    <div class="app">
+        <div class="header">
+            <h1 class="LLM">LLM-WIKI</h1>
+            <p class="intro">The best LLM for coding.</p>
+        </div>
+
+        <div class="chat-container" id="chat"></div>
+
+        <form class="input-container" id="form">
+            <input class="text-input" id="query" placeholder="Ask anything..." required>
+            <button class="submit-btn">Send</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        const SKILLS_API="http://127.0.0.1:8000/api/skills"
+        const UPLOAD_API="http://127.0.0.1:8000/api/skills/upload"
+        const SEARCH_API="http://127.0.0.1:8000/api/search"
+        const skillsPanel=document.getElementById("skillsPanel")
+        const overlay=document.getElementById("overlay")
+        const settingsToggle=document.getElementById("settingsToggle")
+        const closePanel=document.getElementById("closePanel")
+        const skillsList=document.getElementById("skillsList")
+        const skillInput=document.getElementById("skillInput")
+        const skillFile=document.getElementById("skillFile")
+        const saveBtn=document.getElementById("saveSkill")
+        const uploadBtn=document.getElementById("uploadSkill")
+        const cancelBtn=document.getElementById("cancelSkill")
+        const skillCountSpan=document.getElementById("skillCount")
+        const form=document.getElementById("form")
+        const input=document.getElementById("query")
+        const chat=document.getElementById("chat")
+        let skills=[]
+
+        marked.setOptions({breaks:true,gfm:true})
+
+        function escapeHTML(str){
+        if(!str)return""
+        return String(str).replace(/[&<>"]/g,m=>m==="&"?"&amp;":m==="<"?"&lt;":m===">"?"&gt;":"&quot;")
+        }
+
+        function openPanel(){
+        skillsPanel.classList.add("open")
+        overlay.classList.add("active")
+        loadSkills()
+        }
+
+        function closePanelFn(){
+        skillsPanel.classList.remove("open")
+        overlay.classList.remove("active")
+        skillInput.value=""
+        skillFile.value=""
+        }
+
+        settingsToggle.addEventListener("click",openPanel)
+        closePanel.addEventListener("click",closePanelFn)
+        overlay.addEventListener("click",closePanelFn)
+
+        async function loadSkills(){
+        try{
+        const response=await fetch(SKILLS_API)
+        if(!response.ok)throw new Error("load")
+        const data=await response.json()
+        skills=Array.isArray(data)?data:[]
+        renderSkills()
+        }catch(error){
+        skills=[]
+        renderSkills()
+        }
+        }
+
+        function renderSkills(){
+        if(skills.length===0){
+        skillsList.innerHTML='<div class="empty-msg">Навыков пока нет</div>'
+        skillCountSpan.textContent="0"
+        return
+        }
+        skillsList.innerHTML=skills.map((skill,index)=>{
+        const name=skill.name||`Навык ${index+1}`
+        const content=skill.description||skill.content||""
+        const meta=[skill.filename?`file: ${skill.filename}`:"",skill.source?`src: ${skill.source}`:""].filter(Boolean).join(" · ")
+        const id=encodeURIComponent(skill.filename||skill.name||name)
+        return `
+        <div class="skill-item">
+        <div class="skill-header">
+        <span class="skill-name">${escapeHTML(name)}</span>
+        <button class="delete-btn" data-id="${id}">Удалить</button>
+        </div>
+        ${meta?`<div class="skill-content">${escapeHTML(meta)}</div>`:""}
+        <div class="skill-content">${escapeHTML(content)}</div>
+        </div>`
+        }).join("")
+        skillCountSpan.textContent=String(skills.length)
+        document.querySelectorAll(".delete-btn").forEach(btn=>{
+        btn.addEventListener("click",async e=>{
+        const id=e.target.dataset.id
+        await deleteSkill(id)
+        })
+        })
+        }
+
+        async function saveNewSkill(){
+        const skillContent=skillInput.value.trim()
+        if(!skillContent){
+        alert("Введите описание навыка")
+        return
+        }
+        const skillData={name:`Навык ${skills.length+1}`,content:skillContent}
+        try{
+        const response=await fetch(SKILLS_API,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(skillData)
+        })
+        const data=await response.json()
+        if(!response.ok||data.status==="error")throw new Error(data.message||"save")
+        skillInput.value=""
+        await loadSkills()
+        }catch(error){
+        alert("Ошибка сохранения")
+        }
+        }
+
+        async function uploadSkillFile(){
+        const file=skillFile.files[0]
+        if(!file){
+        alert("Выберите файл")
+        return
+        }
+        const body=new FormData()
+        body.append("file",file)
+        try{
+        const response=await fetch(UPLOAD_API,{method:"POST",body})
+        const data=await response.json()
+        if(!response.ok||data.status==="error")throw new Error(data.message||"upload")
+        skillFile.value=""
+        skillInput.value=""
+        await loadSkills()
+        }catch(error){
+        alert("Ошибка загрузки файла")
+        }
+        }
+
+        async function deleteSkill(id){
+        if(!id)return
+        if(!confirm("Удалить навык?"))return
+        try{
+        const response=await fetch(`${SKILLS_API}/${id}`,{method:"DELETE"})
+        const data=await response.json()
+        if(!response.ok||data.status==="error")throw new Error(data.message||"delete")
+        await loadSkills()
+        }catch(error){
+        alert("Ошибка удаления")
+        }
+        }
+
+        saveBtn.addEventListener("click",saveNewSkill)
+        uploadBtn.addEventListener("click",uploadSkillFile)
+        cancelBtn.addEventListener("click",()=>{
+        skillInput.value=""
+        skillFile.value=""
+        skillInput.focus()
+        })
+
+        skillInput.addEventListener("keydown",e=>{
+        if(e.key==="Enter"&&e.ctrlKey){
+        e.preventDefault()
+        saveNewSkill()
+        }
+        if(e.key==="Escape"){
+        skillInput.value=""
+        skillInput.blur()
+        }
+        })
+
+        function scrollBottom(){
+        window.scrollTo(0,document.body.scrollHeight)
+        }
+
+        function createMessage(query){
+        chat.innerHTML+=`
+        <div class="chat-message">
+        <div class="message-user">
+        <span class="message-label">You</span>
+        <div class="user-text">${escapeHTML(query)}</div>
+        </div>
+        <div class="message-ai">
+        <span class="message-label">LLM</span>
+        <div class="markdown-body typing"><span></span><span></span><span></span></div>
+        </div>
+        </div>`
+        return chat.lastElementChild.querySelector(".markdown-body")
+        }
+
+        function typeWriter(element,text){
+        let index=0
+        let timer=setInterval(()=>{
+        index++
+        const part=text.substring(0,index)
+        element.innerHTML=marked.parse(part)
+        scrollBottom()
+        if(index>=text.length){
+        clearInterval(timer)
+        element.innerHTML=marked.parse(text)
+        }
+        },15)
+        }
+
+        form.addEventListener("submit",async e=>{
+        e.preventDefault()
+        const query=input.value.trim()
+        if(!query)return
+        input.value=""
+        const box=createMessage(query)
+        scrollBottom()
+        try{
+        const body=new FormData()
+        body.append("query",query)
+        const response=await fetch(SEARCH_API,{method:"POST",body})
+        const data=await response.json()
+        box.classList.remove("typing")
+        box.innerHTML=""
+        if(data.error){
+        box.innerHTML="Error: "+escapeHTML(data.error)
+        return
+        }
+        const answer=data.result||data.query||"No response"
+        typeWriter(box,String(answer))
+        }catch(error){
+        box.classList.remove("typing")
+        box.innerHTML="Error: "+escapeHTML(error.message)
+        }
+        })
+
+        loadSkills()
+    </script>
+</body>
+</html>

@@ -1,0 +1,2239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM-WIKI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf8f5;
+            --bg-surface: #ffffff;
+            --bg-elevated: #f3f0eb;
+            --bg-hover: #ece8e2;
+            --border: #e5e0d8;
+            --border-strong: #cdc6ba;
+            --text: #2a2622;
+            --text-secondary: #716c64;
+            --text-tertiary: #a09a90;
+            --accent: #8b6f47;
+            --accent-light: #b8976a;
+            --accent-bg: rgba(139,111,71,0.06);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.03);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.05);
+            --shadow-lg: 0 12px 48px rgba(0,0,0,0.07);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --ease: cubic-bezier(0.23, 1, 0.32, 1);
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg: #141311;
+            --bg-surface: #1c1a17;
+            --bg-elevated: #23201c;
+            --bg-hover: #2a2722;
+            --border: #2e2b26;
+            --border-strong: #3d3933;
+            --text: #e8e4dd;
+            --text-secondary: #9a948a;
+            --text-tertiary: #6b655c;
+            --accent: #c4a46c;
+            --accent-light: #d4bc8a;
+            --accent-bg: rgba(196,164,108,0.08);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.3);
+            --shadow-lg: 0 12px 48px rgba(0,0,0,0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            cursor: none;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background 0.5s var(--ease), color 0.5s var(--ease);
+        }
+
+        .welcome-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: opacity 0.8s var(--ease), visibility 0.8s;
+        }
+
+            .welcome-overlay.hidden {
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+            }
+
+        .welcome-content {
+            text-align: center;
+            animation: welcomeFadeIn 1s var(--ease) 0.2s forwards;
+            opacity: 0;
+        }
+
+        @keyframes welcomeFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.96);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .welcome-logo {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 32px;
+            position: relative;
+        }
+
+            .welcome-logo .logo-square {
+                position: absolute;
+                inset: 0;
+                border: 1.5px solid var(--border-strong);
+                border-radius: var(--radius-sm);
+                transform: rotate(45deg) scale(0.5);
+                animation: logoAppear 1s var(--ease-spring) 0.3s forwards;
+            }
+
+            .welcome-logo .logo-inner {
+                position: absolute;
+                inset: 14px;
+                border: 1px solid var(--accent);
+                border-radius: 4px;
+                transform: rotate(45deg) scale(0.3);
+                animation: logoAppear 1s var(--ease-spring) 0.5s forwards;
+            }
+
+        @keyframes logoAppear {
+            to {
+                transform: rotate(45deg) scale(1);
+            }
+        }
+
+        .welcome-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.8rem;
+            font-weight: 400;
+            letter-spacing: 12px;
+            color: var(--text);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .welcome-tagline {
+            font-size: 0.65rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        .welcome-bar {
+            width: 120px;
+            height: 1px;
+            background: var(--border);
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .welcome-bar-inner {
+            width: 0%;
+            height: 100%;
+            background: var(--accent);
+            animation: welcomeProgress 2.5s var(--ease) 0.6s forwards;
+        }
+
+        @keyframes welcomeProgress {
+            to {
+                width: 100%;
+            }
+        }
+
+        .welcome-skip {
+            margin-top: 32px;
+            font-size: 0.62rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            background: none;
+            border: 1px solid var(--border);
+            padding: 12px 32px;
+            border-radius: 100px;
+            cursor: none;
+            transition: all 0.3s var(--ease);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
+            animation: welcomeFadeIn 0.6s var(--ease) 1.8s forwards;
+            opacity: 0;
+        }
+
+            .welcome-skip:hover {
+                background: var(--text);
+                border-color: var(--text);
+                color: var(--bg);
+            }
+
+        .cursor-main {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: var(--text);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99999;
+            transition: transform 0.1s var(--ease-spring), background 0.3s;
+            mix-blend-mode: difference;
+        }
+
+        .cursor-ring {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 1.5px solid var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99998;
+            transition: transform 0.15s var(--ease), width 0.3s, height 0.3s, border-color 0.3s, opacity 0.3s;
+            opacity: 0.35;
+        }
+
+            .cursor-ring.hover {
+                width: 60px;
+                height: 60px;
+                opacity: 0.6;
+                border-color: var(--accent-light);
+            }
+
+            .cursor-ring.click {
+                transform: translate(-50%, -50%) scale(0.7) !important;
+            }
+
+        .cursor-trail {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99997;
+            background: var(--accent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 30% 70%, var(--accent-bg) 0%, transparent 50%), radial-gradient(ellipse at 70% 20%, var(--accent-bg) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+            transition: background 0.5s;
+        }
+
+        .app {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 80px;
+            padding-bottom: 24px;
+            position: relative;
+            animation: headerReveal 0.8s var(--ease) 0.2s forwards;
+            opacity: 0;
+        }
+
+        @keyframes headerReveal {
+            from {
+                opacity: 0;
+                transform: translateY(-12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 1px;
+            background: var(--border-strong);
+        }
+
+        .logo-mark {
+            width: 36px;
+            height: 36px;
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+            .logo-mark .sq1 {
+                position: absolute;
+                inset: 0;
+                border: 1.5px solid var(--border-strong);
+                border-radius: 6px;
+                transform: rotate(45deg);
+                transition: transform 0.8s var(--ease-spring);
+            }
+
+            .logo-mark .sq2 {
+                position: absolute;
+                inset: 8px;
+                border: 1px solid var(--accent);
+                border-radius: 3px;
+                transform: rotate(45deg);
+                transition: transform 0.8s var(--ease-spring) 0.1s;
+            }
+
+            .logo-mark:hover .sq1 {
+                transform: rotate(135deg);
+            }
+
+            .logo-mark:hover .sq2 {
+                transform: rotate(-45deg);
+            }
+
+        .LLM {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.4rem;
+            font-weight: 400;
+            letter-spacing: 8px;
+            color: var(--text);
+            text-transform: uppercase;
+        }
+
+        .intro {
+            margin-top: 8px;
+            font-size: 0.62rem;
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+        }
+
+        .top-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 500;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            cursor: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s var(--ease);
+            animation: btnReveal 0.5s var(--ease) 0.6s forwards;
+            opacity: 0;
+        }
+
+        @keyframes btnReveal {
+            from {
+                opacity: 0;
+                transform: translateY(-8px) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .icon-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .icon-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+            transition: transform 0.5s var(--ease);
+        }
+
+        .icon-btn:hover svg {
+            transform: rotate(30deg);
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 700px;
+            margin: 40px auto 160px;
+            padding: 0 20px;
+        }
+
+        .chat-message {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 28px;
+            animation: messageSlideIn 0.5s var(--ease) forwards;
+            opacity: 0;
+            transform: translateY(16px);
+        }
+
+        @keyframes messageSlideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-user {
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            background: var(--text);
+            color: var(--bg);
+            align-self: flex-end;
+            max-width: 78%;
+            font-size: 0.88rem;
+            line-height: 1.65;
+            font-weight: 300;
+            position: relative;
+        }
+
+            .message-user .message-label {
+                font-size: 0.5rem;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+                color: rgba(255,255,255,0.35);
+                display: block;
+                margin-bottom: 6px;
+                font-weight: 500;
+            }
+
+            .message-user .user-text {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+
+        .message-ai {
+            align-self: flex-start;
+            max-width: 95%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+            .message-ai .message-label {
+                font-size: 0.55rem;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+                color: var(--text-tertiary);
+                font-weight: 500;
+                padding-left: 2px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+                .message-ai .message-label::after {
+                    content: '';
+                    flex: 1;
+                    height: 1px;
+                    background: var(--border);
+                    max-width: 60px;
+                }
+
+        .markdown-body {
+            font-size: 0.88rem;
+            line-height: 1.85;
+            color: var(--text);
+            font-weight: 350;
+            padding: 22px 26px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            position: relative;
+        }
+
+            .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+                font-family: 'Instrument Serif', serif;
+                margin: 24px 0 10px;
+                font-weight: 400;
+                color: var(--text);
+                letter-spacing: 0.3px;
+            }
+
+                .markdown-body h1:first-child, .markdown-body h2:first-child, .markdown-body h3:first-child {
+                    margin-top: 0;
+                }
+
+            .markdown-body h1 {
+                font-size: 1.5rem;
+            }
+
+            .markdown-body h2 {
+                font-size: 1.2rem;
+            }
+
+            .markdown-body h3 {
+                font-size: 1.05rem;
+            }
+
+            .markdown-body p {
+                margin: 12px 0;
+            }
+
+                .markdown-body p:first-child {
+                    margin-top: 0;
+                }
+
+                .markdown-body p:last-child {
+                    margin-bottom: 0;
+                }
+
+            .markdown-body ul, .markdown-body ol {
+                padding-left: 20px;
+                margin: 12px 0;
+            }
+
+            .markdown-body li {
+                margin: 6px 0;
+                line-height: 1.7;
+            }
+
+            .markdown-body code {
+                background: var(--bg-elevated);
+                padding: 2px 7px;
+                border-radius: 4px;
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 0.82em;
+                color: var(--accent);
+                border: 1px solid var(--border);
+            }
+
+            .markdown-body pre {
+                background: #1e1c19;
+                color: #e8e4de;
+                padding: 18px 20px;
+                border-radius: var(--radius-sm);
+                overflow: auto;
+                margin: 16px 0;
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 0.82rem;
+                line-height: 1.65;
+                border: 1px solid #2c2825;
+                position: relative;
+            }
+
+        [data-theme="dark"] .markdown-body pre {
+            background: #0e0d0b;
+            border-color: var(--border-strong);
+        }
+
+        .markdown-body pre code {
+            background: none;
+            padding: 0;
+            border: none;
+            color: inherit;
+            font-size: inherit;
+        }
+
+        .markdown-body pre .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 10px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.6rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: none;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
+            transition: all 0.2s var(--ease);
+            opacity: 0;
+        }
+
+        .markdown-body pre:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .markdown-body pre .copy-btn:hover {
+            background: rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.8);
+        }
+
+        .markdown-body pre .copy-btn.copied {
+            background: rgba(139,111,71,0.3);
+            color: #e8e4de;
+        }
+
+        .markdown-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.84rem;
+        }
+
+        .markdown-body td, .markdown-body th {
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .markdown-body th {
+            background: var(--bg-elevated);
+            font-weight: 600;
+        }
+
+        .markdown-body a {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.15s;
+        }
+
+            .markdown-body a:hover {
+                border-bottom-color: var(--accent);
+            }
+
+        .markdown-body strong {
+            font-weight: 600;
+        }
+
+        .markdown-body em {
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        .markdown-body blockquote {
+            border-left: 2px solid var(--accent);
+            padding-left: 16px;
+            margin: 16px 0;
+            color: var(--text-secondary);
+            font-style: italic;
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.05rem;
+        }
+
+        .markdown-body hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 20px 0;
+        }
+
+        .markdown-body ::selection {
+            background: rgba(139,111,71,0.2);
+            color: var(--text);
+        }
+
+        .markdown-body pre ::selection {
+            background: rgba(196,164,108,0.25);
+            color: #e8e4de;
+        }
+
+        .streaming-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.15em;
+            background: var(--accent);
+            margin-left: 2px;
+            vertical-align: text-bottom;
+            animation: cursorBlink 0.7s step-end infinite;
+        }
+
+        @keyframes cursorBlink {
+            0%, 100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .typing {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            padding: 16px 22px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            width: fit-content;
+        }
+
+            .typing span {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: var(--text-tertiary);
+                animation: typingDot 1.4s var(--ease) infinite;
+            }
+
+                .typing span:nth-child(2) {
+                    animation-delay: 0.2s;
+                }
+
+                .typing span:nth-child(3) {
+                    animation-delay: 0.4s;
+                }
+
+        @keyframes typingDot {
+            0%, 60%, 100% {
+                opacity: 0.2;
+                transform: translateY(0) scale(1);
+            }
+
+            30% {
+                opacity: 1;
+                transform: translateY(-5px) scale(1.2);
+            }
+        }
+
+        .input-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 660px;
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            background: var(--bg-surface);
+            padding: 8px 8px 8px 20px;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+            z-index: 100;
+            transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+            animation: inputSlideUp 0.6s var(--ease) 0.5s forwards;
+            opacity: 0;
+        }
+
+        @keyframes inputSlideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .input-container:focus-within {
+            border-color: var(--accent);
+            box-shadow: var(--shadow-md), 0 0 0 3px var(--accent-bg);
+        }
+
+        .text-input {
+            flex: 1;
+            padding: 10px 0;
+            font-size: 0.88rem;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text);
+            resize: none;
+            min-height: 22px;
+            max-height: 140px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+            .text-input::placeholder {
+                color: var(--text-tertiary);
+                font-style: italic;
+                font-family: 'Instrument Serif', serif;
+                font-size: 0.95rem;
+            }
+
+        .submit-btn {
+            padding: 10px 22px;
+            background: var(--text);
+            border: none;
+            border-radius: var(--radius-lg);
+            color: var(--bg);
+            cursor: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: all 0.3s var(--ease);
+            flex-shrink: 0;
+        }
+
+            .submit-btn:hover {
+                background: var(--accent);
+            }
+
+            .submit-btn:active {
+                transform: scale(0.96);
+            }
+
+        .reasoning-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-tertiary);
+            cursor: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s var(--ease);
+            flex-shrink: 0;
+            position: relative;
+        }
+
+            .reasoning-toggle:hover {
+                border-color: var(--accent);
+                color: var(--accent);
+            }
+
+            .reasoning-toggle.active {
+                background: var(--accent-bg);
+                border-color: var(--accent);
+                color: var(--accent);
+            }
+
+            .reasoning-toggle svg {
+                width: 16px;
+                height: 16px;
+                fill: currentColor;
+                transition: transform 0.3s var(--ease-spring);
+            }
+
+            .reasoning-toggle.active svg {
+                transform: scale(1.1);
+            }
+
+            .reasoning-toggle .reasoning-dot {
+                position: absolute;
+                top: 4px;
+                right: 4px;
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: var(--accent);
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .reasoning-toggle.active .reasoning-dot {
+                opacity: 1;
+                animation: dotPulse 2s var(--ease) infinite;
+            }
+
+        @keyframes dotPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.3);
+                opacity: 0.6;
+            }
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 18px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            box-shadow: var(--shadow-md);
+            animation: toastSlideIn 0.35s var(--ease) forwards;
+            font-weight: 400;
+        }
+
+            .toast.removing {
+                animation: toastSlideOut 0.3s var(--ease) forwards;
+            }
+
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @keyframes toastSlideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+        }
+
+        .overlay {
+            opacity: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.1);
+            backdrop-filter: blur(4px);
+            z-index: 998;
+            pointer-events: none;
+            transition: opacity 0.3s var(--ease);
+        }
+
+            .overlay.active {
+                opacity: 1;
+                pointer-events: all;
+            }
+
+        .skills-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 380px;
+            height: 100vh;
+            background: var(--bg-surface);
+            color: var(--text);
+            padding: 28px 24px;
+            box-shadow: var(--shadow-lg);
+            transform: translateX(100%);
+            transition: transform 0.4s var(--ease);
+            z-index: 1000;
+            overflow-y: auto;
+            font-family: 'DM Sans', sans-serif;
+            border-left: 1px solid var(--border);
+        }
+
+            .skills-panel::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            .skills-panel::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .skills-panel::-webkit-scrollbar-thumb {
+                background: var(--border-strong);
+                border-radius: 2px;
+            }
+
+            .skills-panel.open {
+                transform: translateX(0);
+            }
+
+            .skills-panel h2 {
+                font-family: 'Instrument Serif', serif;
+                font-size: 1.2rem;
+                font-weight: 400;
+                letter-spacing: 2px;
+                color: var(--text);
+                border-bottom: 1px solid var(--border);
+                padding-bottom: 14px;
+                margin: 0 0 16px;
+                text-transform: uppercase;
+            }
+
+            .skills-panel .close-btn {
+                position: absolute;
+                top: 20px;
+                right: 18px;
+                background: var(--bg-elevated);
+                border: none;
+                color: var(--text-secondary);
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                font-size: 14px;
+                cursor: none;
+                transition: all 0.3s var(--ease);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+                .skills-panel .close-btn:hover {
+                    background: var(--text);
+                    color: var(--bg);
+                }
+
+        .skill-item {
+            background: var(--bg);
+            padding: 14px 16px;
+            margin: 10px 0;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            transition: all 0.3s var(--ease);
+        }
+
+            .skill-item:hover {
+                border-color: var(--border-strong);
+            }
+
+            .skill-item .skill-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .skill-item .skill-name {
+                font-weight: 500;
+                color: var(--text);
+                font-size: 0.82rem;
+                font-family: 'Instrument Serif', serif;
+            }
+
+            .skill-item .skill-content {
+                font-size: 0.72rem;
+                color: var(--text-secondary);
+                line-height: 1.6;
+                margin-top: 8px;
+                padding: 8px 10px;
+                background: var(--bg-surface);
+                border-radius: 4px;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                max-height: 90px;
+                overflow-y: auto;
+                font-family: 'JetBrains Mono', monospace;
+                border: 1px solid var(--border);
+            }
+
+            .skill-item .delete-btn {
+                background: transparent;
+                border: 1px solid var(--border);
+                color: var(--text-tertiary);
+                padding: 3px 10px;
+                border-radius: 4px;
+                cursor: none;
+                font-size: 0.6rem;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                transition: all 0.3s var(--ease);
+                font-weight: 500;
+            }
+
+                .skill-item .delete-btn:hover {
+                    background: var(--text);
+                    border-color: var(--text);
+                    color: var(--bg);
+                }
+
+        .skills-panel .add-section {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+            .skills-panel .add-section textarea {
+                width: 100%;
+                padding: 12px;
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--border);
+                background: var(--bg);
+                color: var(--text);
+                font-size: 0.8rem;
+                font-family: 'JetBrains Mono', monospace;
+                font-weight: 300;
+                resize: vertical;
+                min-height: 70px;
+                transition: all 0.3s var(--ease);
+                line-height: 1.5;
+            }
+
+                .skills-panel .add-section textarea:focus {
+                    outline: none;
+                    border-color: var(--accent);
+                    background: var(--bg-surface);
+                }
+
+                .skills-panel .add-section textarea::placeholder {
+                    color: var(--text-tertiary);
+                    font-style: italic;
+                    font-family: 'Instrument Serif', serif;
+                    font-size: 0.88rem;
+                }
+
+            .skills-panel .add-section .button-row {
+                display: flex;
+                gap: 6px;
+            }
+
+            .skills-panel .add-section button {
+                padding: 8px 14px;
+                border: 1px solid var(--border);
+                border-radius: var(--radius-sm);
+                cursor: none;
+                font-weight: 500;
+                transition: all 0.3s var(--ease);
+                font-family: 'DM Sans', sans-serif;
+                font-size: 0.65rem;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                background: var(--bg);
+                color: var(--text-secondary);
+                flex: 1;
+            }
+
+                .skills-panel .add-section button:hover {
+                    border-color: var(--border-strong);
+                }
+
+            .skills-panel .add-section .save-btn {
+                background: var(--text);
+                border-color: var(--text);
+                color: var(--bg);
+            }
+
+                .skills-panel .add-section .save-btn:hover {
+                    background: var(--accent);
+                    border-color: var(--accent);
+                }
+
+            .skills-panel .add-section .file-input {
+                width: 100%;
+                padding: 10px;
+                border: 1px dashed var(--border-strong);
+                border-radius: var(--radius-sm);
+                background: transparent;
+                color: var(--text-secondary);
+                font-size: 0.75rem;
+                transition: all 0.3s var(--ease);
+            }
+
+                .skills-panel .add-section .file-input:hover {
+                    border-color: var(--accent);
+                }
+
+        .skills-panel .empty-msg {
+            color: var(--text-tertiary);
+            text-align: center;
+            margin: 36px 0;
+            font-style: italic;
+            font-size: 0.9rem;
+            font-family: 'Instrument Serif', serif;
+        }
+
+        .panel-footer {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-strong);
+            border-radius: 3px;
+        }
+
+        ::selection {
+            background: rgba(139,111,71,0.15);
+            color: var(--text);
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+            border-radius: 2px;
+        }
+
+        .input-container:focus-within {
+            outline: none;
+        }
+
+        .page-wrapper {
+            animation: pageFadeIn 0.8s var(--ease) forwards;
+        }
+
+        @keyframes pageFadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .files-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 340px;
+            height: 100vh;
+            background: var(--bg-surface);
+            color: var(--text);
+            padding: 28px 20px;
+            box-shadow: var(--shadow-lg);
+            transform: translateX(-100%);
+            transition: transform 0.4s var(--ease);
+            z-index: 1000;
+            overflow-y: auto;
+            font-family: 'DM Sans', sans-serif;
+            border-right: 1px solid var(--border);
+        }
+
+        .files-panel::-webkit-scrollbar { width: 4px; }
+        .files-panel::-webkit-scrollbar-track { background: transparent; }
+        .files-panel::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+
+        .files-panel.open { transform: translateX(0); }
+
+        .files-panel h2 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.2rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            color: var(--text);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 14px;
+            margin: 0 0 12px;
+            text-transform: uppercase;
+        }
+
+        .files-panel .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 18px;
+            background: var(--bg-elevated);
+            border: none;
+            color: var(--text-secondary);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s var(--ease);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .files-panel .close-btn:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .files-toolbar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .files-tool-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg);
+            color: var(--text-secondary);
+            font-size: 0.65rem;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s var(--ease);
+        }
+
+        .files-tool-btn:hover {
+            border-color: var(--border-strong);
+            color: var(--text);
+        }
+
+        .files-breadcrumb {
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            word-break: break-all;
+        }
+
+        .files-breadcrumb span {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .files-breadcrumb span:hover { color: var(--accent); }
+
+        .files-tree { font-size: 0.8rem; }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s var(--ease);
+            color: var(--text-secondary);
+            user-select: none;
+        }
+
+        .file-item:hover {
+            background: var(--bg-hover);
+            color: var(--text);
+        }
+
+        .file-item.active {
+            background: var(--accent-bg);
+            color: var(--accent);
+        }
+
+        .file-item .file-icon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            opacity: 0.6;
+        }
+
+        .file-item .file-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-item .file-size {
+            font-size: 0.65rem;
+            color: var(--text-tertiary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .file-editor-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 5000;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.2s ease;
+        }
+
+        .file-editor-overlay.active { display: flex; align-items: center; justify-content: center; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .file-editor {
+            width: 90%;
+            max-width: 900px;
+            height: 80vh;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: editorSlideIn 0.3s var(--ease);
+        }
+
+        @keyframes editorSlideIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .file-editor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-elevated);
+        }
+
+        .file-editor-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .file-editor-actions { display: flex; gap: 6px; }
+
+        .file-editor-btn {
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg);
+            color: var(--text-secondary);
+            font-size: 0.68rem;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s var(--ease);
+        }
+
+        .file-editor-btn:hover { border-color: var(--border-strong); color: var(--text); }
+
+        .file-editor-btn:first-child {
+            background: var(--text);
+            color: var(--bg);
+            border-color: var(--text);
+        }
+
+        .file-editor-btn:first-child:hover { background: var(--accent); border-color: var(--accent); }
+
+        .file-editor-delete:hover { background: #c0392b; border-color: #c0392b; color: #fff; }
+
+        .file-editor-textarea {
+            flex: 1;
+            width: 100%;
+            padding: 16px 20px;
+            border: none;
+            outline: none;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            line-height: 1.7;
+            resize: none;
+            tab-size: 4;
+        }
+
+        .file-editor-preview {
+            display: none;
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: var(--bg);
+        }
+
+        .file-editor-preview.active { display: block; }
+        .file-editor-textarea.hidden { display: none; }
+
+        .file-editor-toggle { padding: 8px 20px; border-top: 1px solid var(--border); }
+
+        @media (max-width: 700px) {
+            .LLM {
+                font-size: 1.8rem;
+                letter-spacing: 5px;
+            }
+
+            .intro {
+                font-size: 0.58rem;
+                letter-spacing: 2px;
+            }
+
+            .chat-container {
+                padding: 0 14px;
+                margin-top: 20px;
+            }
+
+            .input-container {
+                width: 94%;
+                padding: 6px 6px 6px 14px;
+                gap: 6px;
+                bottom: 16px;
+            }
+
+            .submit-btn {
+                padding: 9px 14px;
+                font-size: 0.6rem;
+            }
+
+            .reasoning-toggle {
+                width: 32px;
+                height: 32px;
+            }
+
+            .skills-panel {
+                width: 100%;
+            }
+
+            .message-user {
+                max-width: 88%;
+            }
+
+            .message-ai {
+                max-width: 96%;
+            }
+
+            .welcome-title {
+                font-size: 2rem;
+                letter-spacing: 8px;
+            }
+
+            .welcome-tagline {
+                font-size: 0.55rem;
+                letter-spacing: 3px;
+            }
+
+            .top-controls {
+                top: 14px;
+                right: 14px;
+            }
+
+            .icon-btn {
+                width: 36px;
+                height: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-overlay" id="welcomeOverlay">
+        <div class="welcome-content">
+            <div class="welcome-logo">
+                <div class="logo-square"></div>
+                <div class="logo-inner"></div>
+            </div>
+            <h1 class="welcome-title">LLM-WIKI</h1>
+            <p class="welcome-tagline">The best LLM for coding</p>
+            <div class="welcome-bar"><div class="welcome-bar-inner"></div></div>
+            <button class="welcome-skip" id="welcomeSkip">Enter</button>
+        </div>
+    </div>
+
+    <div class="cursor-main" id="cursorMain"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+    <div class="cursor-trail" id="cursorTrail1"></div>
+    <div class="cursor-trail" id="cursorTrail2"></div>
+    <div class="cursor-trail" id="cursorTrail3"></div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="app page-wrapper">
+        <div class="header">
+            <div class="logo-mark">
+                <div class="sq1"></div>
+                <div class="sq2"></div>
+            </div>
+            <h1 class="LLM">LLM-WIKI</h1>
+            <p class="intro">The best LLM for coding</p>
+        </div>
+
+        <div class="chat-container" id="chat"></div>
+
+        <form class="input-container" id="form">
+            <textarea class="text-input" id="query" placeholder="Ask anything..." required autocomplete="off" rows="1"></textarea>
+            <button class="reasoning-toggle" id="reasoningToggle" type="button" title="Toggle reasoning mode">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" /></svg>
+                <div class="reasoning-dot"></div>
+            </button>
+            <button class="reasoning-toggle" id="agentToggle" type="button" title="Agent mode (execute commands, read/write files)">
+                <svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                <div class="reasoning-dot"></div>
+            </button>
+            <button class="submit-btn" type="submit">Send</button>
+        </form>
+    </div>
+
+    <div class="top-controls">
+        <button class="icon-btn" id="filesToggle" aria-label="File manager">
+            <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+        </button>
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">
+            <svg id="themeIcon" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.48-.04-.96-.12-1.43a5.4 5.4 0 0 1-4.49-4.49A7.96 7.96 0 0 1 12 3z" /></svg>
+        </button>
+        <button class="icon-btn" id="settingsToggle" aria-label="Skills settings">
+            <svg viewBox="0 0 24 24"><path d="M19.14 12.94a7.07 7.07 0 0 0 0-1.88l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.04 7.04 0 0 0-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84a.49.49 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87a.49.49 0 0 0 .12.61l2.03 1.58a7.07 7.07 0 0 0 0 1.88l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.49.37 1.03.7 1.62.94l.36 2.54c.05.24.26.41.48.41h3.84c.22 0 .43-.17.48-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 0 0-.12-.61l-2.03-1.58zM12 15.6A3.6 3.6 0 1 1 15.6 12 3.6 3.6 0 0 1 12 15.6z" /></svg>
+        </button>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="files-panel" id="filesPanel">
+        <button class="close-btn" id="closeFilesPanel" aria-label="Close panel">&times;</button>
+        <h2>Files</h2>
+        <div class="files-toolbar">
+            <button class="files-tool-btn" id="filesNewFile" title="New file">+ File</button>
+            <button class="files-tool-btn" id="filesNewFolder" title="New folder">+ Folder</button>
+            <button class="files-tool-btn" id="filesRefresh" title="Refresh">&#8635;</button>
+        </div>
+        <div class="files-breadcrumb" id="filesBreadcrumb"></div>
+        <div class="files-tree" id="filesTree"></div>
+    </div>
+
+    <div class="file-editor-overlay" id="fileEditorOverlay">
+        <div class="file-editor">
+            <div class="file-editor-header">
+                <span class="file-editor-name" id="editorFileName"></span>
+                <div class="file-editor-actions">
+                    <button class="file-editor-btn" id="editorSave">Save</button>
+                    <button class="file-editor-btn" id="editorRename">Rename</button>
+                    <button class="file-editor-btn file-editor-delete" id="editorDelete">Delete</button>
+                    <button class="file-editor-btn" id="editorClose">&times;</button>
+                </div>
+            </div>
+            <textarea class="file-editor-textarea" id="editorContent" spellcheck="false"></textarea>
+            <div class="file-editor-preview" id="editorPreview"></div>
+            <div class="file-editor-toggle">
+                <button class="file-editor-btn" id="editorToggleView">Preview</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="skills-panel" id="skillsPanel">
+        <button class="close-btn" id="closePanel" aria-label="Close panel">&times;</button>
+        <h2>Skills</h2>
+        <div id="skillsList"></div>
+        <div class="add-section">
+            <textarea id="skillInput" placeholder="Paste skill description here..."></textarea>
+            <input class="file-input" id="skillFile" type="file" accept=".zip,.md,.txt,.json,.skill">
+            <div class="button-row">
+                <button class="save-btn" id="saveSkill">Save</button>
+                <button class="upload-btn" id="uploadSkill">Upload</button>
+                <button class="cancel-btn" id="cancelSkill">Clear</button>
+            </div>
+        </div>
+        <div class="panel-footer">Total: <span id="skillCount">0</span></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        const SKILLS_API = "http://127.0.0.1:8000/api/skills";
+        const UPLOAD_API = "http://127.0.0.1:8000/api/skills/upload";
+        const STREAM_API = "http://127.0.0.1:8000/api/search/stream";
+        const AGENT_API = "http://127.0.0.1:8000/api/agent";
+
+        const skillsPanel = document.getElementById("skillsPanel");
+        const overlay = document.getElementById("overlay");
+        const settingsToggle = document.getElementById("settingsToggle");
+        const closePanelBtn = document.getElementById("closePanel");
+        const skillsList = document.getElementById("skillsList");
+        const skillInput = document.getElementById("skillInput");
+        const skillFile = document.getElementById("skillFile");
+        const saveBtn = document.getElementById("saveSkill");
+        const uploadBtn = document.getElementById("uploadSkill");
+        const cancelBtn = document.getElementById("cancelSkill");
+        const skillCountSpan = document.getElementById("skillCount");
+        const reasoningToggle = document.getElementById("reasoningToggle");
+        const agentToggle = document.getElementById("agentToggle");
+        const form = document.getElementById("form");
+        const input = document.getElementById("query");
+        const chat = document.getElementById("chat");
+        const welcomeOverlay = document.getElementById("welcomeOverlay");
+        const welcomeSkip = document.getElementById("welcomeSkip");
+        const themeToggle = document.getElementById("themeToggle");
+        const themeIcon = document.getElementById("themeIcon");
+
+        let skills = [];
+        let cursorX = 0, cursorY = 0;
+        let ringX = 0, ringY = 0;
+        let reasoningMode = false;
+        let agentMode = false;
+        let isStreaming = false;
+        const isDesktop = !!(window.pywebview || window.external || navigator.userAgent.toLowerCase().includes("pywebview"));
+
+        if (isDesktop) {
+            agentMode = true;
+            agentToggle.style.display = "none";
+        } else {
+            agentToggle.style.display = "none";
+        }
+        let welcomeDone = false;
+
+        const sunPath = "M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0-5v2m0 16v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M2 12h2m16 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42";
+        const moonPath = "M12 3a9 9 0 1 0 9 9c0-.48-.04-.96-.12-1.43a5.4 5.4 0 0 1-4.49-4.49A7.96 7.96 0 0 1 12 3z";
+
+        function getTheme() { return localStorage.getItem("theme") || "light"; }
+        function setTheme(t) {
+        document.documentElement.setAttribute("data-theme", t);
+        themeIcon.querySelector("path").setAttribute("d", t === "dark" ? sunPath : moonPath);
+        localStorage.setItem("theme", t);
+        }
+        setTheme(getTheme());
+        themeToggle.addEventListener("click", () => setTheme(getTheme() === "dark" ? "light" : "dark"));
+
+        marked.setOptions({ breaks: true, gfm: true });
+
+        function dismissWelcome() {
+        if (welcomeDone) return;
+        welcomeDone = true;
+        welcomeOverlay.classList.add("hidden");
+        setTimeout(() => welcomeOverlay.remove(), 900);
+        }
+        welcomeSkip.addEventListener("click", dismissWelcome);
+        welcomeOverlay.addEventListener("click", (e) => { if (e.target === welcomeOverlay) dismissWelcome(); });
+        setTimeout(dismissWelcome, 3500);
+
+        function showToast(message) {
+        const container = document.getElementById("toastContainer");
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(() => {
+        toast.classList.add("removing");
+        setTimeout(() => toast.remove(), 300);
+        }, 2200);
+        }
+
+        const cursorMain = document.getElementById("cursorMain");
+        const cursorRing = document.getElementById("cursorRing");
+        const trails = [
+        document.getElementById("cursorTrail1"),
+        document.getElementById("cursorTrail2"),
+        document.getElementById("cursorTrail3")
+        ];
+        let trailPositions = [{x:0,y:0},{x:0,y:0},{x:0,y:0}];
+        let mouseMoving = false;
+        let moveTimeout;
+
+        document.addEventListener("mousemove", (e) => {
+        cursorX = e.clientX;
+        cursorY = e.clientY;
+        cursorMain.style.left = cursorX + "px";
+        cursorMain.style.top = cursorY + "px";
+        cursorMain.style.transform = "translate(-50%, -50%)";
+        mouseMoving = true;
+        trails.forEach(t => t.style.opacity = "0.4");
+        clearTimeout(moveTimeout);
+        moveTimeout = setTimeout(() => {
+        mouseMoving = false;
+        trails.forEach(t => t.style.opacity = "0");
+        }, 150);
+        });
+
+        function animateCursor() {
+        ringX += (cursorX - ringX) * 0.08;
+        ringY += (cursorY - ringY) * 0.08;
+        cursorRing.style.left = ringX + "px";
+        cursorRing.style.top = ringY + "px";
+        cursorRing.style.transform = "translate(-50%, -50%)";
+        if (mouseMoving) {
+        trailPositions[0].x += (cursorX - trailPositions[0].x) * 0.15;
+        trailPositions[0].y += (cursorY - trailPositions[0].y) * 0.15;
+        trailPositions[1].x += (trailPositions[0].x - trailPositions[1].x) * 0.12;
+        trailPositions[1].y += (trailPositions[0].y - trailPositions[1].y) * 0.12;
+        trailPositions[2].x += (trailPositions[1].x - trailPositions[2].x) * 0.1;
+        trailPositions[2].y += (trailPositions[1].y - trailPositions[2].y) * 0.1;
+        const sizes = [6, 4, 3];
+        const opacities = [0.3, 0.2, 0.1];
+        trails.forEach((t, i) => {
+        t.style.left = trailPositions[i].x + "px";
+        t.style.top = trailPositions[i].y + "px";
+        t.style.transform = "translate(-50%, -50%)";
+        t.style.width = sizes[i] + "px";
+        t.style.height = sizes[i] + "px";
+        t.style.opacity = opacities[i];
+        });
+        }
+        requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        const hoverSel = "a, button, input, textarea, .skill-item, .submit-btn, .icon-btn, .close-btn, .delete-btn, .reasoning-toggle";
+        document.addEventListener("mouseover", (e) => { if (e.target.closest(hoverSel)) cursorRing.classList.add("hover"); });
+        document.addEventListener("mouseout", (e) => { if (e.target.closest(hoverSel)) cursorRing.classList.remove("hover"); });
+        document.addEventListener("mousedown", () => cursorRing.classList.add("click"));
+        document.addEventListener("mouseup", () => cursorRing.classList.remove("click"));
+
+        function escapeHTML(str) {
+        if (!str) return "";
+        return String(str).replace(/[&<>"]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[m]);
+        }
+
+        function openPanel() { skillsPanel.classList.add("open"); overlay.classList.add("active"); loadSkills(); }
+        function closePanelFn() { skillsPanel.classList.remove("open"); overlay.classList.remove("active"); skillInput.value = ""; skillFile.value = ""; }
+        settingsToggle.addEventListener("click", openPanel);
+        closePanelBtn.addEventListener("click", closePanelFn);
+        overlay.addEventListener("click", closePanelFn);
+        document.addEventListener("keydown", (e) => { if (e.key === "Escape" && skillsPanel.classList.contains("open")) closePanelFn(); });
+
+        async function loadSkills() {
+        try { const r = await fetch(SKILLS_API); skills = r.ok ? await r.json() : []; skills = Array.isArray(skills) ? skills : []; } catch { skills = []; }
+        renderSkills();
+        }
+
+        function renderSkills() {
+        if (!skills.length) { skillsList.innerHTML = '<div class="empty-msg">No skills yet</div>'; skillCountSpan.textContent = "0"; return; }
+        skillsList.innerHTML = skills.map((s, i) => {
+        const name = s.name || `Skill ${i + 1}`;
+        const content = s.description || s.content || "";
+        const meta = [s.filename ? `file: ${s.filename}` : "", s.source ? `src: ${s.source}` : ""].filter(Boolean).join(" · ");
+        const id = encodeURIComponent(s.filename || s.name || name);
+        return `<div class="skill-item"><div class="skill-header"><span class="skill-name">${escapeHTML(name)}</span><button class="delete-btn" data-id="${id}">Remove</button></div>${meta ? `<div style="font-size:0.65rem;color:var(--text-tertiary);margin-top:4px;">${escapeHTML(meta)}</div>` : ""}<div class="skill-content">${escapeHTML(content)}</div></div>`;
+        }).join("");
+        skillCountSpan.textContent = String(skills.length);
+        document.querySelectorAll(".delete-btn").forEach(btn => { btn.addEventListener("click", async e => { await deleteSkill(e.target.dataset.id); }); });
+        }
+
+        async function saveNewSkill() {
+        const content = skillInput.value.trim();
+        if (!content) { showToast("Enter skill description"); return; }
+        try {
+        const r = await fetch(SKILLS_API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: `Skill ${skills.length + 1}`, content }) });
+        const d = await r.json();
+        if (!r.ok || d.status === "error") throw new Error();
+        skillInput.value = ""; showToast("Skill saved"); await loadSkills();
+        } catch { showToast("Save error"); }
+        }
+
+        async function uploadSkillFile() {
+        const file = skillFile.files[0];
+        if (!file) { showToast("Choose a file"); return; }
+        const body = new FormData(); body.append("file", file);
+        try {
+        const endpoint = file.name.endsWith('.zip') ? `${SKILLS_API}/upload-zip` : UPLOAD_API;
+        const r = await fetch(endpoint, { method: "POST", body });
+        const d = await r.json();
+        if (!r.ok || d.status === "error") throw new Error();
+        skillFile.value = ""; skillInput.value = ""; showToast("File uploaded"); await loadSkills();
+        } catch { showToast("Upload error"); }
+        }
+
+        async function deleteSkill(id) {
+        if (!id || !confirm("Remove this skill?")) return;
+        try {
+        const r = await fetch(`${SKILLS_API}/${id}`, { method: "DELETE" });
+        const d = await r.json();
+        if (!r.ok || d.status === "error") throw new Error();
+        showToast("Skill removed"); await loadSkills();
+        } catch { showToast("Delete error"); }
+        }
+
+        saveBtn.addEventListener("click", saveNewSkill);
+        uploadBtn.addEventListener("click", uploadSkillFile);
+        cancelBtn.addEventListener("click", () => { skillInput.value = ""; skillFile.value = ""; skillInput.focus(); });
+        skillInput.addEventListener("keydown", e => { if (e.key === "Enter" && e.ctrlKey) { e.preventDefault(); saveNewSkill(); } });
+
+        reasoningToggle.addEventListener("click", () => {
+        reasoningMode = !reasoningMode;
+        reasoningToggle.classList.toggle("active", reasoningMode);
+        showToast(reasoningMode ? "Reasoning enabled" : "Reasoning disabled");
+        });
+
+        if (!isDesktop) {
+            agentToggle.addEventListener("click", () => {
+            agentMode = !agentMode;
+            agentToggle.classList.toggle("active", agentMode);
+            showToast(agentMode ? "Agent mode ON" : "Agent mode OFF");
+            });
+        }
+
+        function scrollBottom() { requestAnimationFrame(() => { window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }); }); }
+
+        function addCopyButtons(box) {
+        const preBlocks = box.querySelectorAll("pre");
+        preBlocks.forEach(pre => {
+        if (pre.querySelector(".copy-btn")) return;
+        const btn = document.createElement("button");
+        btn.className = "copy-btn";
+        btn.textContent = "Copy";
+        btn.addEventListener("click", async () => {
+        const code = pre.querySelector("code");
+        const text = code ? code.textContent : pre.textContent;
+        try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = "Copied!"; btn.classList.add("copied");
+        setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 1500);
+        } catch { btn.textContent = "Error"; setTimeout(() => btn.textContent = "Copy", 1500); }
+        });
+        pre.appendChild(btn);
+        });
+        }
+
+        function createMessage(query) {
+        let label = "LLM";
+        if (agentMode) label = "Agent";
+        else if (reasoningMode) label = "LLM · reasoning";
+        chat.innerHTML += `<div class="chat-message"><div class="message-user"><span class="message-label">You</span><div class="user-text">${escapeHTML(query)}</div></div><div class="message-ai"><span class="message-label">${escapeHTML(label)}</span><div class="markdown-body typing"><span></span><span></span><span></span></div></div></div>`;
+        return chat.lastElementChild.querySelector(".markdown-body");
+        }
+
+        async function streamSearch(query, box) {
+        isStreaming = true;
+        let fullText = "";
+        box.classList.remove("typing");
+        box.innerHTML = '<span class="streaming-cursor"></span>';
+        try {
+        const body = new FormData();
+        body.append("query", query);
+        body.append("reasoning", String(reasoningMode));
+        const response = await fetch(STREAM_API, { method: "POST", body });
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const lines = decoder.decode(value).split("\n");
+        for (const line of lines) {
+        if (!line.startsWith("data: ")) continue;
+        try {
+        const p = JSON.parse(line.slice(6));
+        if (p.error) { box.innerHTML = "Error: " + escapeHTML(p.error); return; }
+        if (p.done) break;
+        if (p.content) { fullText += p.content; box.innerHTML = marked.parse(fullText) + '<span class="streaming-cursor"></span>'; scrollBottom(); }
+        } catch {}
+        }
+        }
+        box.innerHTML = marked.parse(fullText);
+        addCopyButtons(box);
+        scrollBottom();
+        } catch (e) { box.innerHTML = "Error: " + escapeHTML(e.message); }
+        finally { isStreaming = false; }
+        }
+
+        async function streamAgent(query, box) {
+        isStreaming = true;
+        box.classList.remove("typing");
+        box.innerHTML = '<div style="padding:12px;color:var(--text-tertiary);font-size:0.82rem;">Agent is working...</div>';
+        try {
+        const response = await fetch(AGENT_API, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({query})
+        });
+        const data = await response.json();
+        if (data.error) { box.innerHTML = "Error: " + escapeHTML(data.error); return; }
+        let html = "";
+        const actions = data.actions || [];
+        if (actions.length > 0) {
+            html += '<div style="margin-bottom:12px;">';
+            for (const a of actions) {
+                const toolName = a.tool;
+                const args = a.args;
+                const result = a.result;
+                let detail = "";
+                if (toolName === "execute_command") detail = escapeHTML(args.command || "");
+                else if (toolName === "read_file") detail = escapeHTML(args.path || "");
+                else if (toolName === "write_file") detail = escapeHTML(args.path || "");
+                else if (toolName === "list_directory") detail = escapeHTML(args.path || "cwd");
+                else if (toolName === "create_directory") detail = escapeHTML(args.path || "");
+                else if (toolName === "delete_file") detail = escapeHTML(args.path || "");
+                else if (toolName === "search_in_files") detail = escapeHTML(args.query || "");
+                const resultStr = JSON.stringify(result, null, 2);
+                html += `<details style="margin:6px 0;padding:8px 12px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:6px;font-size:0.78rem;"><summary style="cursor:pointer;font-weight:500;color:var(--accent);font-family:'JetBrains Mono',monospace;">${escapeHTML(toolName)}: ${detail}</summary><pre style="margin:8px 0 0;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:4px;font-size:0.72rem;overflow-x:auto;white-space:pre-wrap;">${escapeHTML(resultStr)}</pre></details>`;
+            }
+            html += '</div>';
+        }
+        if (data.answer) html += marked.parse(data.answer);
+        box.innerHTML = html || '<div style="color:var(--text-tertiary);">No response</div>';
+        addCopyButtons(box);
+        scrollBottom();
+        } catch (e) { box.innerHTML = "Error: " + escapeHTML(e.message); }
+        finally { isStreaming = false; }
+        }
+
+        input.addEventListener("input", function() { this.style.height = "auto"; this.style.height = Math.min(this.scrollHeight, 140) + "px"; });
+        input.addEventListener("keydown", function(e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); } });
+
+        form.addEventListener("submit", async e => {
+        e.preventDefault();
+        const query = input.value.trim();
+        if (!query || isStreaming) return;
+        input.value = ""; input.style.height = "auto";
+        const box = createMessage(query);
+        scrollBottom();
+        if (agentMode) await streamAgent(query, box);
+        else await streamSearch(query, box);
+        });
+
+        loadSkills();
+
+        const FILES_API = "http://127.0.0.1:8000/api/files";
+        const filesPanel = document.getElementById("filesPanel");
+        const filesToggle = document.getElementById("filesToggle");
+        const closeFilesPanel = document.getElementById("closeFilesPanel");
+        const filesTree = document.getElementById("filesTree");
+        const filesBreadcrumb = document.getElementById("filesBreadcrumb");
+        const filesNewFile = document.getElementById("filesNewFile");
+        const filesNewFolder = document.getElementById("filesNewFolder");
+        const filesRefresh = document.getElementById("filesRefresh");
+        const fileEditorOverlay = document.getElementById("fileEditorOverlay");
+        const editorFileName = document.getElementById("editorFileName");
+        const editorContent = document.getElementById("editorContent");
+        const editorPreview = document.getElementById("editorPreview");
+        const editorSave = document.getElementById("editorSave");
+        const editorRename = document.getElementById("editorRename");
+        const editorDelete = document.getElementById("editorDelete");
+        const editorClose = document.getElementById("editorClose");
+        const editorToggleView = document.getElementById("editorToggleView");
+
+        let currentFilePath = "";
+        let currentDir = "";
+        let editorMode = "edit";
+
+        function openFilesPanel() { filesPanel.classList.add("open"); overlay.classList.add("active"); loadFiles(""); }
+        function closeFilesPanelFn() { filesPanel.classList.remove("open"); overlay.classList.remove("active"); }
+        filesToggle.addEventListener("click", openFilesPanel);
+        closeFilesPanel.addEventListener("click", closeFilesPanelFn);
+
+        async function loadFiles(dir) {
+            currentDir = dir;
+            try {
+                const r = await fetch(`${FILES_API}/tree?path=${encodeURIComponent(dir)}`);
+                const data = await r.json();
+                if (data.error) { filesTree.innerHTML = `<div class="empty-msg">${escapeHTML(data.error)}</div>`; return; }
+                renderBreadcrumb(dir);
+                renderFileTree(data.items || []);
+            } catch { filesTree.innerHTML = '<div class="empty-msg">Error loading</div>'; }
+        }
+
+        function renderBreadcrumb(dir) {
+            const parts = dir ? dir.split("/").filter(Boolean) : [];
+            let html = '<span data-path="">root</span>';
+            let accumulated = "";
+            for (const part of parts) {
+                accumulated += (accumulated ? "/" : "") + part;
+                const p = accumulated;
+                html += ` / <span data-path="${escapeHTML(p)}">${escapeHTML(part)}</span>`;
+            }
+            filesBreadcrumb.innerHTML = html;
+            filesBreadcrumb.querySelectorAll("span").forEach(s => {
+                s.addEventListener("click", () => loadFiles(s.dataset.path));
+            });
+        }
+
+        function renderFileTree(items) {
+            if (!items.length) { filesTree.innerHTML = '<div class="empty-msg">Empty folder</div>'; return; }
+            filesTree.innerHTML = items.map(item => {
+                const isDir = item.type === "dir";
+                const icon = isDir
+                    ? '<svg class="file-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>'
+                    : '<svg class="file-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h5v7h7v9H6z"/></svg>';
+                const size = isDir ? "" : formatSize(item.size);
+                return `<div class="file-item" data-path="${escapeHTML(item.path)}" data-type="${item.type}">${icon}<span class="file-name">${escapeHTML(item.name)}</span>${size ? `<span class="file-size">${size}</span>` : ""}</div>`;
+            }).join("");
+            filesTree.querySelectorAll(".file-item").forEach(el => {
+                el.addEventListener("click", () => {
+                    const p = el.dataset.path;
+                    const t = el.dataset.type;
+                    if (t === "dir") loadFiles(p);
+                    else openFileEditor(p);
+                });
+            });
+        }
+
+        function formatSize(b) {
+            if (b < 1024) return b + " B";
+            if (b < 1048576) return (b / 1024).toFixed(1) + " KB";
+            return (b / 1048576).toFixed(1) + " MB";
+        }
+
+        async function openFileEditor(path) {
+            try {
+                const r = await fetch(`${FILES_API}/read?path=${encodeURIComponent(path)}`);
+                const data = await r.json();
+                if (data.error) { showToast(data.error); return; }
+                currentFilePath = path;
+                editorFileName.textContent = path;
+                editorContent.value = data.content;
+                editorMode = "edit";
+                editorContent.classList.remove("hidden");
+                editorPreview.classList.remove("active");
+                editorPreview.innerHTML = "";
+                editorToggleView.textContent = "Preview";
+                fileEditorOverlay.classList.add("active");
+            } catch { showToast("Error opening file"); }
+        }
+
+        editorClose.addEventListener("click", () => fileEditorOverlay.classList.remove("active"));
+        fileEditorOverlay.addEventListener("click", (e) => { if (e.target === fileEditorOverlay) fileEditorOverlay.classList.remove("active"); });
+
+        editorSave.addEventListener("click", async () => {
+            if (!currentFilePath) return;
+            try {
+                const r = await fetch(`${FILES_API}/write`, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({path: currentFilePath, content: editorContent.value})
+                });
+                const d = await r.json();
+                if (d.error) { showToast(d.error); return; }
+                showToast("Saved");
+                loadFiles(currentDir);
+            } catch { showToast("Save error"); }
+        });
+
+        editorRename.addEventListener("click", async () => {
+            if (!currentFilePath) return;
+            const oldName = currentFilePath.split("/").pop();
+            const newName = prompt("New name:", oldName);
+            if (!newName || newName === oldName) return;
+            try {
+                const r = await fetch(`${FILES_API}/rename`, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({old_path: currentFilePath, new_name: newName})
+                });
+                const d = await r.json();
+                if (d.error) { showToast(d.error); return; }
+                currentFilePath = d.path;
+                editorFileName.textContent = d.path;
+                showToast("Renamed");
+                loadFiles(currentDir);
+            } catch { showToast("Rename error"); }
+        });
+
+        editorDelete.addEventListener("click", async () => {
+            if (!currentFilePath || !confirm("Delete this file?")) return;
+            try {
+                const r = await fetch(`${FILES_API}/delete`, {
+                    method: "DELETE",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({path: currentFilePath})
+                });
+                const d = await r.json();
+                if (d.error) { showToast(d.error); return; }
+                fileEditorOverlay.classList.remove("active");
+                showToast("Deleted");
+                loadFiles(currentDir);
+            } catch { showToast("Delete error"); }
+        });
+
+        editorToggleView.addEventListener("click", () => {
+            if (editorMode === "edit") {
+                editorMode = "preview";
+                editorContent.classList.add("hidden");
+                editorPreview.classList.add("active");
+                editorPreview.innerHTML = marked.parse(editorContent.value);
+                editorToggleView.textContent = "Edit";
+            } else {
+                editorMode = "edit";
+                editorContent.classList.remove("hidden");
+                editorPreview.classList.remove("active");
+                editorToggleView.textContent = "Preview";
+            }
+        });
+
+        editorContent.addEventListener("keydown", (e) => {
+            if (e.key === "Tab") {
+                e.preventDefault();
+                const s = editorContent.selectionStart;
+                const end = editorContent.selectionEnd;
+                editorContent.value = editorContent.value.substring(0, s) + "    " + editorContent.value.substring(end);
+                editorContent.selectionStart = editorContent.selectionEnd = s + 4;
+            }
+            if (e.key === "s" && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                editorSave.click();
+            }
+        });
+
+        filesNewFile.addEventListener("click", async () => {
+            const name = prompt("File name (e.g. script.py):");
+            if (!name) return;
+            const path = currentDir ? currentDir + "/" + name : name;
+            try {
+                const r = await fetch(`${FILES_API}/write`, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({path, content: ""})
+                });
+                const d = await r.json();
+                if (d.error) { showToast(d.error); return; }
+                showToast("Created");
+                loadFiles(currentDir);
+                openFileEditor(d.path);
+            } catch { showToast("Error"); }
+        });
+
+        filesNewFolder.addEventListener("click", async () => {
+            const name = prompt("Folder name:");
+            if (!name) return;
+            const path = currentDir ? currentDir + "/" + name : name;
+            try {
+                const r = await fetch(`${FILES_API}/mkdir`, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({path})
+                });
+                const d = await r.json();
+                if (d.error) { showToast(d.error); return; }
+                showToast("Created");
+                loadFiles(currentDir);
+            } catch { showToast("Error"); }
+        });
+
+        filesRefresh.addEventListener("click", () => loadFiles(currentDir));
+    </script>
+</body>
+</html>

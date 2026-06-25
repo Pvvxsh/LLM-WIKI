@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\core",
+    "\\interface",
+    "\\llm",
+    "\\prompt",
+    "\\vector"
+  ],
+  "SelectedNode": "\\main.py",
+  "PreviewInSolutionExplorer": false
+}
