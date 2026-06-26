@@ -46,14 +46,28 @@ def unique_filename(filename):
         i += 1
 
 
-def load_skills():
+_skills_cache = None
+_skills_cache_time = 0
+
+
+def load_skills(force=False):
+    global _skills_cache, _skills_cache_time
+    import time
+    if _skills_cache is not None and not force and (time.time() - _skills_cache_time) < 300:
+        return _skills_cache
     try:
         data = json.loads(SKILLS_FILE.read_text(encoding="utf-8"))
         if isinstance(data, list):
-            return [x for x in data if isinstance(x, dict)]
+            _skills_cache = [x for x in data if isinstance(x, dict)]
+            _skills_cache_time = time.time()
+            return _skills_cache
     except Exception:
         pass
     return []
+
+
+def reload_skills():
+    return load_skills(force=True)
 
 
 def save_skills(skills):
@@ -306,3 +320,69 @@ async def train_skill(request: dict):
     return JSONResponse(
         content={"status": "success", "message": "Skill saved", "trained": False, "skill": skill}
     )
+
+
+@router.post("/skills/download-github")
+async def download_github_skills(request: dict):
+    import re
+    import httpx as _httpx
+
+    repo = request.get("repo", "").strip()
+    path = request.get("path", "").strip()
+    if not repo:
+        return JSONResponse(content={"status": "error", "message": "repo required"}, status_code=400)
+
+    match = re.search(r"github\.com/([^/]+)/([^/]+)", repo)
+    if match:
+        owner, repo_name = match.group(1), match.group(2)
+    else:
+        parts = repo.strip("/").split("/")
+        if len(parts) >= 2:
+            owner, repo_name = parts[0], parts[1]
+        else:
+            return JSONResponse(content={"status": "error", "message": "Invalid format. Use owner/repo or URL"}, status_code=400)
+
+    try:
+        api_url = f"https://api.github.com/repos/{owner}/{repo_name}/contents/{path}".rstrip("/")
+        async with _httpx.AsyncClient(timeout=30) as client:
+            resp = await client.get(api_url, follow_redirects=True)
+            if resp.status_code != 200:
+                return JSONResponse(content={"status": "error", "message": f"GitHub API returned {resp.status_code}"}, status_code=400)
+
+            items = resp.json()
+            if not isinstance(items, list):
+                items = [items]
+
+            md_files = []
+            for item in items:
+                if item.get("type") == "file" and item.get("name", "").endswith(".md"):
+                    download_url = item.get("download_url")
+                    if download_url:
+                        file_resp = await client.get(download_url)
+                        if file_resp.status_code == 200:
+                            content = file_resp.text
+                            name = item["name"].replace(".md", "").replace("-", " ").replace("_", " ").title()
+                            md_files.append({"name": name, "content": content, "filename": item["name"]})
+
+            if not md_files:
+                return JSONResponse(content={"status": "error", "message": "No .md files found", "repo": f"{owner}/{repo_name}"}, status_code=400)
+
+            saved = []
+            for f in md_files:
+                skill, err = save_skill_payload(
+                    {"name": f["name"], "content": f["content"]},
+                    source=f"github:{owner}/{repo_name}",
+                    filename=f["filename"],
+                )
+                if not err:
+                    saved.append(f["name"])
+
+            return JSONResponse(content={
+                "status": "success",
+                "repo": f"{owner}/{repo_name}",
+                "total_found": len(md_files),
+                "installed": len(saved),
+                "skills": saved,
+            })
+    except Exception as e:
+        return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)

@@ -50,15 +50,8 @@
             --shadow-lg: 0 12px 48px rgba(0,0,0,0.4);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
 
         body {
             font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -68,1511 +61,301 @@
             cursor: none;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
             transition: background 0.5s var(--ease), color 0.5s var(--ease);
         }
 
         .welcome-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 10000;
+            position: fixed; inset: 0; z-index: 10000;
             background: var(--bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
             transition: opacity 0.8s var(--ease), visibility 0.8s;
         }
-
-            .welcome-overlay.hidden {
-                opacity: 0;
-                visibility: hidden;
-                pointer-events: none;
-            }
+        .welcome-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
         .welcome-content {
             text-align: center;
-            animation: welcomeFadeIn 1s var(--ease) 0.2s forwards;
-            opacity: 0;
-        }
-
-        @keyframes welcomeFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px) scale(0.96);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .welcome-logo {
-            width: 56px;
-            height: 56px;
-            margin: 0 auto 32px;
-            position: relative;
-        }
-
-            .welcome-logo .logo-square {
-                position: absolute;
-                inset: 0;
-                border: 1.5px solid var(--border-strong);
-                border-radius: var(--radius-sm);
-                transform: rotate(45deg) scale(0.5);
-                animation: logoAppear 1s var(--ease-spring) 0.3s forwards;
-            }
-
-            .welcome-logo .logo-inner {
-                position: absolute;
-                inset: 14px;
-                border: 1px solid var(--accent);
-                border-radius: 4px;
-                transform: rotate(45deg) scale(0.3);
-                animation: logoAppear 1s var(--ease-spring) 0.5s forwards;
-            }
-
-        @keyframes logoAppear {
-            to {
-                transform: rotate(45deg) scale(1);
-            }
-        }
-
-        .welcome-title {
-            font-family: 'Instrument Serif', serif;
-            font-size: 2.8rem;
-            font-weight: 400;
-            letter-spacing: 12px;
-            color: var(--text);
-            text-transform: uppercase;
-            margin-bottom: 12px;
-        }
-
-        .welcome-tagline {
-            font-size: 0.65rem;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            color: var(--text-tertiary);
-            margin-bottom: 40px;
-            font-weight: 400;
-        }
-
-        .welcome-bar {
-            width: 120px;
-            height: 1px;
-            background: var(--border);
-            margin: 0 auto;
-            overflow: hidden;
-        }
-
-        .welcome-bar-inner {
-            width: 0%;
-            height: 100%;
-            background: var(--accent);
-            animation: welcomeProgress 2.5s var(--ease) 0.6s forwards;
-        }
-
-        @keyframes welcomeProgress {
-            to {
-                width: 100%;
-            }
-        }
-
-        .welcome-skip {
-            margin-top: 32px;
-            font-size: 0.62rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--text-tertiary);
-            background: none;
-            border: 1px solid var(--border);
-            padding: 12px 32px;
-            border-radius: 100px;
-            cursor: none;
-            transition: all 0.3s var(--ease);
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 500;
-            animation: welcomeFadeIn 0.6s var(--ease) 1.8s forwards;
-            opacity: 0;
-        }
-
-            .welcome-skip:hover {
-                background: var(--text);
-                border-color: var(--text);
-                color: var(--bg);
-            }
-
-        .cursor-main {
-            position: fixed;
-            width: 8px;
-            height: 8px;
-            background: var(--text);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 99999;
-            transition: transform 0.1s var(--ease-spring), background 0.3s;
-            mix-blend-mode: difference;
-        }
-
-        .cursor-ring {
-            position: fixed;
-            width: 40px;
-            height: 40px;
-            border: 1.5px solid var(--accent);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 99998;
-            transition: transform 0.15s var(--ease), width 0.3s, height 0.3s, border-color 0.3s, opacity 0.3s;
-            opacity: 0.35;
-        }
-
-            .cursor-ring.hover {
-                width: 60px;
-                height: 60px;
-                opacity: 0.6;
-                border-color: var(--accent-light);
-            }
-
-            .cursor-ring.click {
-                transform: translate(-50%, -50%) scale(0.7) !important;
-            }
-
-        .cursor-trail {
-            position: fixed;
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 99997;
-            background: var(--accent);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(ellipse at 30% 70%, var(--accent-bg) 0%, transparent 50%), radial-gradient(ellipse at 70% 20%, var(--accent-bg) 0%, transparent 40%);
-            pointer-events: none;
-            z-index: 0;
-            transition: background 0.5s;
-        }
-
-        .app {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .header {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 80px;
-            padding-bottom: 24px;
-            position: relative;
-            animation: headerReveal 0.8s var(--ease) 0.2s forwards;
-            opacity: 0;
-        }
-
-        @keyframes headerReveal {
-            from {
-                opacity: 0;
-                transform: translateY(-12px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .header::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 1px;
-            background: var(--border-strong);
-        }
-
-        .logo-mark {
-            width: 36px;
-            height: 36px;
-            position: relative;
-            margin-bottom: 16px;
-        }
-
-            .logo-mark .sq1 {
-                position: absolute;
-                inset: 0;
-                border: 1.5px solid var(--border-strong);
-                border-radius: 6px;
-                transform: rotate(45deg);
-                transition: transform 0.8s var(--ease-spring);
-            }
-
-            .logo-mark .sq2 {
-                position: absolute;
-                inset: 8px;
-                border: 1px solid var(--accent);
-                border-radius: 3px;
-                transform: rotate(45deg);
-                transition: transform 0.8s var(--ease-spring) 0.1s;
-            }
-
-            .logo-mark:hover .sq1 {
-                transform: rotate(135deg);
-            }
-
-            .logo-mark:hover .sq2 {
-                transform: rotate(-45deg);
-            }
-
-        .LLM {
-            font-family: 'Instrument Serif', serif;
-            font-size: 2.4rem;
-            font-weight: 400;
-            letter-spacing: 8px;
-            color: var(--text);
-            text-transform: uppercase;
-        }
-
-        .intro {
-            margin-top: 8px;
-            font-size: 0.62rem;
-            font-weight: 400;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: var(--text-tertiary);
-        }
-
-        .top-controls {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 8px;
-            z-index: 500;
-        }
-
-        .icon-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1px solid var(--border);
-            background: var(--bg-surface);
-            color: var(--text-secondary);
-            cursor: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.3s var(--ease);
-            animation: btnReveal 0.5s var(--ease) 0.6s forwards;
-            opacity: 0;
-        }
-
-        @keyframes btnReveal {
-            from {
-                opacity: 0;
-                transform: translateY(-8px) scale(0.9);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .icon-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            transform: scale(1.05);
-        }
-
-        .icon-btn svg {
-            width: 18px;
-            height: 18px;
-            fill: currentColor;
-            transition: transform 0.5s var(--ease);
-        }
-
-        .icon-btn:hover svg {
-            transform: rotate(30deg);
-        }
-
-        .chat-container {
-            width: 100%;
-            max-width: 700px;
-            margin: 40px auto 160px;
-            padding: 0 20px;
-        }
-
-        .chat-message {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            margin-bottom: 28px;
-            animation: messageSlideIn 0.5s var(--ease) forwards;
-            opacity: 0;
-            transform: translateY(16px);
-        }
-
-        @keyframes messageSlideIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .message-user {
-            padding: 14px 20px;
-            border-radius: var(--radius-md);
-            background: var(--text);
-            color: var(--bg);
-            align-self: flex-end;
-            max-width: 78%;
-            font-size: 0.88rem;
-            line-height: 1.65;
-            font-weight: 300;
-            position: relative;
-        }
-
-            .message-user .message-label {
-                font-size: 0.5rem;
-                letter-spacing: 2px;
-                text-transform: uppercase;
-                color: rgba(255,255,255,0.35);
-                display: block;
-                margin-bottom: 6px;
-                font-weight: 500;
-            }
-
-            .message-user .user-text {
-                white-space: pre-wrap;
-                word-wrap: break-word;
-            }
-
-        .message-ai {
-            align-self: flex-start;
-            max-width: 95%;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-            .message-ai .message-label {
-                font-size: 0.55rem;
-                letter-spacing: 2px;
-                text-transform: uppercase;
-                color: var(--text-tertiary);
-                font-weight: 500;
-                padding-left: 2px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-                .message-ai .message-label::after {
-                    content: '';
-                    flex: 1;
-                    height: 1px;
-                    background: var(--border);
-                    max-width: 60px;
-                }
-
-        .markdown-body {
-            font-size: 0.88rem;
-            line-height: 1.85;
-            color: var(--text);
-            font-weight: 350;
-            padding: 22px 26px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            position: relative;
-        }
-
-            .markdown-body h1, .markdown-body h2, .markdown-body h3 {
-                font-family: 'Instrument Serif', serif;
-                margin: 24px 0 10px;
-                font-weight: 400;
-                color: var(--text);
-                letter-spacing: 0.3px;
-            }
-
-                .markdown-body h1:first-child, .markdown-body h2:first-child, .markdown-body h3:first-child {
-                    margin-top: 0;
-                }
-
-            .markdown-body h1 {
-                font-size: 1.5rem;
-            }
-
-            .markdown-body h2 {
-                font-size: 1.2rem;
-            }
-
-            .markdown-body h3 {
-                font-size: 1.05rem;
-            }
-
-            .markdown-body p {
-                margin: 12px 0;
-            }
-
-                .markdown-body p:first-child {
-                    margin-top: 0;
-                }
-
-                .markdown-body p:last-child {
-                    margin-bottom: 0;
-                }
-
-            .markdown-body ul, .markdown-body ol {
-                padding-left: 20px;
-                margin: 12px 0;
-            }
-
-            .markdown-body li {
-                margin: 6px 0;
-                line-height: 1.7;
-            }
-
-            .markdown-body code {
-                background: var(--bg-elevated);
-                padding: 2px 7px;
-                border-radius: 4px;
-                font-family: 'JetBrains Mono', monospace;
-                font-size: 0.82em;
-                color: var(--accent);
-                border: 1px solid var(--border);
-            }
-
-            .markdown-body pre {
-                background: #1e1c19;
-                color: #e8e4de;
-                padding: 18px 20px;
-                border-radius: var(--radius-sm);
-                overflow: auto;
-                margin: 16px 0;
-                font-family: 'JetBrains Mono', monospace;
-                font-size: 0.82rem;
-                line-height: 1.65;
-                border: 1px solid #2c2825;
-                position: relative;
-            }
-
-        [data-theme="dark"] .markdown-body pre {
-            background: #0e0d0b;
-            border-color: var(--border-strong);
-        }
-
-        .markdown-body pre code {
-            background: none;
-            padding: 0;
-            border: none;
-            color: inherit;
-            font-size: inherit;
-        }
-
-        .markdown-body pre .copy-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            padding: 4px 10px;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 4px;
-            color: rgba(255,255,255,0.5);
-            font-size: 0.6rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            cursor: none;
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 500;
-            transition: all 0.2s var(--ease);
-            opacity: 0;
-        }
-
-        .markdown-body pre:hover .copy-btn {
-            opacity: 1;
-        }
-
-        .markdown-body pre .copy-btn:hover {
-            background: rgba(255,255,255,0.15);
-            color: rgba(255,255,255,0.8);
-        }
-
-        .markdown-body pre .copy-btn.copied {
-            background: rgba(139,111,71,0.3);
-            color: #e8e4de;
-        }
-
-        .markdown-body table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 16px 0;
-            font-size: 0.84rem;
-        }
-
-        .markdown-body td, .markdown-body th {
-            border: 1px solid var(--border);
-            padding: 8px 12px;
-            text-align: left;
-        }
-
-        .markdown-body th {
-            background: var(--bg-elevated);
-            font-weight: 600;
-        }
-
-        .markdown-body a {
-            color: var(--accent);
-            text-decoration: none;
-            border-bottom: 1px solid transparent;
-            transition: border-color 0.15s;
-        }
-
-            .markdown-body a:hover {
-                border-bottom-color: var(--accent);
-            }
-
-        .markdown-body strong {
-            font-weight: 600;
-        }
-
-        .markdown-body em {
-            font-style: italic;
-            color: var(--text-secondary);
-        }
-
-        .markdown-body blockquote {
-            border-left: 2px solid var(--accent);
-            padding-left: 16px;
-            margin: 16px 0;
-            color: var(--text-secondary);
-            font-style: italic;
-            font-family: 'Instrument Serif', serif;
-            font-size: 1.05rem;
-        }
-
-        .markdown-body hr {
-            border: none;
-            border-top: 1px solid var(--border);
-            margin: 20px 0;
-        }
-
-        .markdown-body ::selection {
-            background: rgba(139,111,71,0.2);
-            color: var(--text);
-        }
-
-        .markdown-body pre ::selection {
-            background: rgba(196,164,108,0.25);
-            color: #e8e4de;
-        }
-
-        .streaming-cursor {
-            display: inline-block;
-            width: 2px;
-            height: 1.15em;
-            background: var(--accent);
-            margin-left: 2px;
-            vertical-align: text-bottom;
-            animation: cursorBlink 0.7s step-end infinite;
-        }
-
-        @keyframes cursorBlink {
-            0%, 100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0;
-            }
-        }
-
-        .typing {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-            padding: 16px 22px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            width: fit-content;
-        }
-
-            .typing span {
-                width: 6px;
-                height: 6px;
-                border-radius: 50%;
-                background: var(--text-tertiary);
-                animation: typingDot 1.4s var(--ease) infinite;
-            }
-
-                .typing span:nth-child(2) {
-                    animation-delay: 0.2s;
-                }
-
-                .typing span:nth-child(3) {
-                    animation-delay: 0.4s;
-                }
-
-        @keyframes typingDot {
-            0%, 60%, 100% {
-                opacity: 0.2;
-                transform: translateY(0) scale(1);
-            }
-
-            30% {
-                opacity: 1;
-                transform: translateY(-5px) scale(1.2);
-            }
-        }
-
-        .input-container {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 92%;
-            max-width: 660px;
-            display: flex;
-            align-items: flex-end;
-            gap: 8px;
-            background: var(--bg-surface);
-            padding: 8px 8px 8px 20px;
-            border-radius: var(--radius-xl);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-md);
-            z-index: 100;
-            transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
-            animation: inputSlideUp 0.6s var(--ease) 0.5s forwards;
-            opacity: 0;
-        }
-
-        @keyframes inputSlideUp {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) translateY(24px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-        }
-
-        .input-container:focus-within {
-            border-color: var(--accent);
-            box-shadow: var(--shadow-md), 0 0 0 3px var(--accent-bg);
-        }
-
-        .text-input {
-            flex: 1;
-            padding: 10px 0;
-            font-size: 0.88rem;
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 300;
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--text);
-            resize: none;
-            min-height: 22px;
-            max-height: 140px;
-            line-height: 1.5;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            overflow-x: hidden;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border) transparent;
-        }
-
-            .text-input::placeholder {
-                color: var(--text-tertiary);
-                font-style: italic;
-                font-family: 'Instrument Serif', serif;
-                font-size: 0.95rem;
-            }
-
-        .submit-btn {
-            padding: 10px 22px;
-            background: var(--text);
-            border: none;
-            border-radius: var(--radius-lg);
-            color: var(--bg);
-            cursor: none;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.65rem;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            transition: all 0.3s var(--ease);
-            flex-shrink: 0;
-        }
-
-            .submit-btn:hover {
-                background: var(--accent);
-            }
-
-            .submit-btn:active {
-                transform: scale(0.96);
-            }
-
-        .reasoning-toggle {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 1px solid var(--border);
-            background: transparent;
-            color: var(--text-tertiary);
-            cursor: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s var(--ease);
-            flex-shrink: 0;
-            position: relative;
-        }
-
-            .reasoning-toggle:hover {
-                border-color: var(--accent);
-                color: var(--accent);
-            }
-
-            .reasoning-toggle.active {
-                background: var(--accent-bg);
-                border-color: var(--accent);
-                color: var(--accent);
-            }
-
-            .reasoning-toggle svg {
-                width: 16px;
-                height: 16px;
-                fill: currentColor;
-                transition: transform 0.3s var(--ease-spring);
-            }
-
-            .reasoning-toggle.active svg {
-                transform: scale(1.1);
-            }
-
-            .reasoning-toggle .reasoning-dot {
-                position: absolute;
-                top: 4px;
-                right: 4px;
-                width: 6px;
-                height: 6px;
-                border-radius: 50%;
-                background: var(--accent);
-                opacity: 0;
-                transition: opacity 0.3s;
-            }
-
-            .reasoning-toggle.active .reasoning-dot {
-                opacity: 1;
-                animation: dotPulse 2s var(--ease) infinite;
-            }
-
-        @keyframes dotPulse {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-
-            50% {
-                transform: scale(1.3);
-                opacity: 0.6;
-            }
-        }
-
-        .toast-container {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .toast {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 10px 18px;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            box-shadow: var(--shadow-md);
-            animation: toastSlideIn 0.35s var(--ease) forwards;
-            font-weight: 400;
-        }
-
-            .toast.removing {
-                animation: toastSlideOut 0.3s var(--ease) forwards;
-            }
-
-        @keyframes toastSlideIn {
-            from {
-                opacity: 0;
-                transform: translateX(20px) scale(0.95);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
-        }
-
-        @keyframes toastSlideOut {
-            from {
-                opacity: 1;
-                transform: translateX(0);
-            }
-
-            to {
-                opacity: 0;
-                transform: translateX(20px);
-            }
-        }
-
-        .overlay {
-            opacity: 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.1);
-            backdrop-filter: blur(4px);
-            z-index: 998;
-            pointer-events: none;
-            transition: opacity 0.3s var(--ease);
-        }
-
-            .overlay.active {
-                opacity: 1;
-                pointer-events: all;
-            }
-
-        .skills-panel {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 380px;
-            height: 100vh;
-            background: var(--bg-surface);
-            color: var(--text);
-            padding: 28px 24px;
-            box-shadow: var(--shadow-lg);
-            transform: translateX(100%);
-            transition: transform 0.4s var(--ease);
-            z-index: 1000;
-            overflow-y: auto;
-            font-family: 'DM Sans', sans-serif;
-            border-left: 1px solid var(--border);
-        }
-
-            .skills-panel::-webkit-scrollbar {
-                width: 4px;
-            }
-
-            .skills-panel::-webkit-scrollbar-track {
-                background: transparent;
-            }
-
-            .skills-panel::-webkit-scrollbar-thumb {
-                background: var(--border-strong);
-                border-radius: 2px;
-            }
-
-            .skills-panel.open {
-                transform: translateX(0);
-            }
-
-            .skills-panel h2 {
-                font-family: 'Instrument Serif', serif;
-                font-size: 1.2rem;
-                font-weight: 400;
-                letter-spacing: 2px;
-                color: var(--text);
-                border-bottom: 1px solid var(--border);
-                padding-bottom: 14px;
-                margin: 0 0 16px;
-                text-transform: uppercase;
-            }
-
-            .skills-panel .close-btn {
-                position: absolute;
-                top: 20px;
-                right: 18px;
-                background: var(--bg-elevated);
-                border: none;
-                color: var(--text-secondary);
-                width: 30px;
-                height: 30px;
-                border-radius: 50%;
-                font-size: 14px;
-                cursor: none;
-                transition: all 0.3s var(--ease);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-                .skills-panel .close-btn:hover {
-                    background: var(--text);
-                    color: var(--bg);
-                }
-
-        .skill-item {
-            background: var(--bg);
-            padding: 14px 16px;
-            margin: 10px 0;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-            transition: all 0.3s var(--ease);
-        }
-
-            .skill-item:hover {
-                border-color: var(--border-strong);
-            }
-
-            .skill-item .skill-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .skill-item .skill-name {
-                font-weight: 500;
-                color: var(--text);
-                font-size: 0.82rem;
-                font-family: 'Instrument Serif', serif;
-            }
-
-            .skill-item .skill-content {
-                font-size: 0.72rem;
-                color: var(--text-secondary);
-                line-height: 1.6;
-                margin-top: 8px;
-                padding: 8px 10px;
-                background: var(--bg-surface);
-                border-radius: 4px;
-                white-space: pre-wrap;
-                word-wrap: break-word;
-                max-height: 90px;
-                overflow-y: auto;
-                font-family: 'JetBrains Mono', monospace;
-                border: 1px solid var(--border);
-            }
-
-            .skill-item .delete-btn {
-                background: transparent;
-                border: 1px solid var(--border);
-                color: var(--text-tertiary);
-                padding: 3px 10px;
-                border-radius: 4px;
-                cursor: none;
-                font-size: 0.6rem;
-                letter-spacing: 1px;
-                text-transform: uppercase;
-                transition: all 0.3s var(--ease);
-                font-weight: 500;
-            }
-
-                .skill-item .delete-btn:hover {
-                    background: var(--text);
-                    border-color: var(--text);
-                    color: var(--bg);
-                }
-
-        .skills-panel .add-section {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-            .skills-panel .add-section textarea {
-                width: 100%;
-                padding: 12px;
-                border-radius: var(--radius-sm);
-                border: 1px solid var(--border);
-                background: var(--bg);
-                color: var(--text);
-                font-size: 0.8rem;
-                font-family: 'JetBrains Mono', monospace;
-                font-weight: 300;
-                resize: vertical;
-                min-height: 70px;
-                transition: all 0.3s var(--ease);
-                line-height: 1.5;
-            }
-
-                .skills-panel .add-section textarea:focus {
-                    outline: none;
-                    border-color: var(--accent);
-                    background: var(--bg-surface);
-                }
-
-                .skills-panel .add-section textarea::placeholder {
-                    color: var(--text-tertiary);
-                    font-style: italic;
-                    font-family: 'Instrument Serif', serif;
-                    font-size: 0.88rem;
-                }
-
-            .skills-panel .add-section .button-row {
-                display: flex;
-                gap: 6px;
-            }
-
-            .skills-panel .add-section button {
-                padding: 8px 14px;
-                border: 1px solid var(--border);
-                border-radius: var(--radius-sm);
-                cursor: none;
-                font-weight: 500;
-                transition: all 0.3s var(--ease);
-                font-family: 'DM Sans', sans-serif;
-                font-size: 0.65rem;
-                letter-spacing: 1px;
-                text-transform: uppercase;
-                background: var(--bg);
-                color: var(--text-secondary);
-                flex: 1;
-            }
-
-                .skills-panel .add-section button:hover {
-                    border-color: var(--border-strong);
-                }
-
-            .skills-panel .add-section .save-btn {
-                background: var(--text);
-                border-color: var(--text);
-                color: var(--bg);
-            }
-
-                .skills-panel .add-section .save-btn:hover {
-                    background: var(--accent);
-                    border-color: var(--accent);
-                }
-
-            .skills-panel .add-section .file-input {
-                width: 100%;
-                padding: 10px;
-                border: 1px dashed var(--border-strong);
-                border-radius: var(--radius-sm);
-                background: transparent;
-                color: var(--text-secondary);
-                font-size: 0.75rem;
-                transition: all 0.3s var(--ease);
-            }
-
-                .skills-panel .add-section .file-input:hover {
-                    border-color: var(--accent);
-                }
-
-        .skills-panel .empty-msg {
-            color: var(--text-tertiary);
-            text-align: center;
-            margin: 36px 0;
-            font-style: italic;
-            font-size: 0.9rem;
-            font-family: 'Instrument Serif', serif;
-        }
-
-        .panel-footer {
-            margin-top: 16px;
-            padding-top: 14px;
-            border-top: 1px solid var(--border);
-            font-size: 0.7rem;
-            color: var(--text-tertiary);
-        }
-
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border-strong);
-            border-radius: 3px;
-        }
-
-        ::selection {
-            background: rgba(139,111,71,0.15);
-            color: var(--text);
-        }
-
-        :focus-visible {
-            outline: 2px solid var(--accent);
-            outline-offset: 2px;
-            border-radius: 2px;
-        }
-
-        .input-container:focus-within {
-            outline: none;
-        }
-
-        .page-wrapper {
-            animation: pageFadeIn 0.8s var(--ease) forwards;
-        }
-
-        @keyframes pageFadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        .files-panel {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 340px;
-            height: 100vh;
-            background: var(--bg-surface);
-            color: var(--text);
-            padding: 28px 20px;
-            box-shadow: var(--shadow-lg);
-            transform: translateX(-100%);
-            transition: transform 0.4s var(--ease);
-            z-index: 1000;
-            overflow-y: auto;
-            font-family: 'DM Sans', sans-serif;
-            border-right: 1px solid var(--border);
-        }
-
-        .files-panel::-webkit-scrollbar { width: 4px; }
-        .files-panel::-webkit-scrollbar-track { background: transparent; }
-        .files-panel::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
-
-        .files-panel.open { transform: translateX(0); }
-
-        .files-panel h2 {
-            font-family: 'Instrument Serif', serif;
-            font-size: 1.2rem;
-            font-weight: 400;
-            letter-spacing: 2px;
-            color: var(--text);
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 14px;
-            margin: 0 0 12px;
-            text-transform: uppercase;
-        }
-
-        .files-panel .close-btn {
-            position: absolute;
-            top: 20px;
-            right: 18px;
-            background: var(--bg-elevated);
-            border: none;
-            color: var(--text-secondary);
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s var(--ease);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .files-panel .close-btn:hover {
-            background: var(--text);
-            color: var(--bg);
-        }
-
-        .files-toolbar {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-
-        .files-tool-btn {
-            padding: 6px 12px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            background: var(--bg);
-            color: var(--text-secondary);
-            font-size: 0.65rem;
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.3s var(--ease);
-        }
-
-        .files-tool-btn:hover {
-            border-color: var(--border-strong);
-            color: var(--text);
-        }
-
-        .files-breadcrumb {
-            font-size: 0.7rem;
-            color: var(--text-tertiary);
-            padding: 6px 0;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            word-break: break-all;
-        }
-
-        .files-breadcrumb span {
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .files-breadcrumb span:hover { color: var(--accent); }
-
-        .files-tree { font-size: 0.8rem; }
-
-        .file-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 7px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s var(--ease);
-            color: var(--text-secondary);
-            user-select: none;
-        }
-
-        .file-item:hover {
-            background: var(--bg-hover);
-            color: var(--text);
-        }
-
-        .file-item.active {
-            background: var(--accent-bg);
-            color: var(--accent);
-        }
-
-        .file-item .file-icon {
-            width: 16px;
-            height: 16px;
-            flex-shrink: 0;
-            opacity: 0.6;
-        }
-
-        .file-item .file-name {
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .file-item .file-size {
-            font-size: 0.65rem;
-            color: var(--text-tertiary);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .file-editor-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 5000;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(8px);
-            animation: fadeIn 0.2s ease;
-        }
-
-        .file-editor-overlay.active { display: flex; align-items: center; justify-content: center; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .file-editor {
-            width: 90%;
-            max-width: 900px;
-            height: 80vh;
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            animation: editorSlideIn 0.3s var(--ease);
-        }
-
-        @keyframes editorSlideIn {
-            from { opacity: 0; transform: translateY(20px) scale(0.97); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .file-editor-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 20px;
-            border-bottom: 1px solid var(--border);
-            background: var(--bg-elevated);
-        }
-
-        .file-editor-name {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.82rem;
-            color: var(--text);
-            font-weight: 500;
-        }
-
-        .file-editor-actions { display: flex; gap: 6px; }
-
-        .file-editor-btn {
-            padding: 6px 14px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            background: var(--bg);
-            color: var(--text-secondary);
-            font-size: 0.68rem;
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.2s var(--ease);
-        }
-
-        .file-editor-btn:hover { border-color: var(--border-strong); color: var(--text); }
-
-        .file-editor-btn:first-child {
-            background: var(--text);
-            color: var(--bg);
-            border-color: var(--text);
-        }
-
-        .file-editor-btn:first-child:hover { background: var(--accent); border-color: var(--accent); }
-
-        .file-editor-delete:hover { background: #c0392b; border-color: #c0392b; color: #fff; }
-
-        .file-editor-textarea {
-            flex: 1;
-            width: 100%;
-            padding: 16px 20px;
-            border: none;
-            outline: none;
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.82rem;
-            line-height: 1.7;
-            resize: none;
-            tab-size: 4;
-        }
-
-        .file-editor-preview {
-            display: none;
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background: var(--bg);
-        }
-
-        .file-editor-preview.active { display: block; }
-        .file-editor-textarea.hidden { display: none; }
-
-        .file-editor-toggle { padding: 8px 20px; border-top: 1px solid var(--border); }
-
-        @media (max-width: 700px) {
-            .LLM {
-                font-size: 1.8rem;
-                letter-spacing: 5px;
-            }
-
-            .intro {
-                font-size: 0.58rem;
-                letter-spacing: 2px;
-            }
-
-            .chat-container {
-                padding: 0 14px;
-                margin-top: 20px;
-            }
-
-            .input-container {
-                width: 94%;
-                padding: 6px 6px 6px 14px;
-                gap: 6px;
-                bottom: 16px;
-            }
-
-            .submit-btn {
-                padding: 9px 14px;
-                font-size: 0.6rem;
-            }
-
-            .reasoning-toggle {
-                width: 32px;
-                height: 32px;
-            }
-
-            .skills-panel {
-                width: 100%;
-            }
-
-            .message-user {
-                max-width: 88%;
-            }
-
-            .message-ai {
-                max-width: 96%;
-            }
-
-            .welcome-title {
-                font-size: 2rem;
-                letter-spacing: 8px;
-            }
-
-            .welcome-tagline {
-                font-size: 0.55rem;
-                letter-spacing: 3px;
-            }
-
-            .top-controls {
-                top: 14px;
-                right: 14px;
-            }
-
-            .icon-btn {
-                width: 36px;
-                height: 36px;
-            }
+            animation: welcomeFadeIn 1s var(--ease) 0.2s forwards; opacity: 0;
+        }
+        @keyframes welcomeFadeIn { from { opacity:0; transform:translateY(30px) scale(0.96); } to { opacity:1; transform:translateY(0) scale(1); } }
+
+        .welcome-logo { width:56px; height:56px; margin:0 auto 32px; position:relative; }
+        .welcome-logo .logo-square { position:absolute; inset:0; border:1.5px solid var(--border-strong); border-radius:var(--radius-sm); transform:rotate(45deg) scale(0.5); animation:logoAppear 1s var(--ease-spring) 0.3s forwards; }
+        .welcome-logo .logo-inner { position:absolute; inset:14px; border:1px solid var(--accent); border-radius:4px; transform:rotate(45deg) scale(0.3); animation:logoAppear 1s var(--ease-spring) 0.5s forwards; }
+        @keyframes logoAppear { to { transform:rotate(45deg) scale(1); } }
+
+        .welcome-title { font-family:'Instrument Serif',serif; font-size:2.8rem; font-weight:400; letter-spacing:12px; color:var(--text); text-transform:uppercase; margin-bottom:12px; }
+        .welcome-tagline { font-size:0.65rem; letter-spacing:5px; text-transform:uppercase; color:var(--text-tertiary); margin-bottom:40px; }
+        .welcome-bar { width:120px; height:1px; background:var(--border); margin:0 auto; overflow:hidden; }
+        .welcome-bar-inner { width:0%; height:100%; background:var(--accent); animation:welcomeProgress 2.5s var(--ease) 0.6s forwards; }
+        @keyframes welcomeProgress { to { width:100%; } }
+        .welcome-skip { margin-top:32px; font-size:0.62rem; letter-spacing:3px; text-transform:uppercase; color:var(--text-tertiary); background:none; border:1px solid var(--border); padding:12px 32px; border-radius:100px; cursor:none; transition:all 0.3s var(--ease); font-family:'DM Sans',sans-serif; font-weight:500; animation:welcomeFadeIn 0.6s var(--ease) 1.8s forwards; opacity:0; }
+        .welcome-skip:hover { background:var(--text); border-color:var(--text); color:var(--bg); }
+
+        .cursor-main { position:fixed; width:8px; height:8px; background:var(--text); border-radius:50%; pointer-events:none; z-index:99999; transition:transform 0.1s var(--ease-spring), background 0.3s; mix-blend-mode:difference; }
+        .cursor-ring { position:fixed; width:40px; height:40px; border:1.5px solid var(--accent); border-radius:50%; pointer-events:none; z-index:99998; transition:transform 0.15s var(--ease), width 0.3s, height 0.3s, border-color 0.3s, opacity 0.3s; opacity:0.35; }
+        .cursor-ring.hover { width:60px; height:60px; opacity:0.6; border-color:var(--accent-light); }
+        .cursor-ring.click { transform:translate(-50%,-50%) scale(0.7) !important; }
+        .cursor-trail { position:fixed; width:4px; height:4px; border-radius:50%; pointer-events:none; z-index:99997; background:var(--accent); opacity:0; transition:opacity 0.3s; }
+
+        body::before { content:''; position:fixed; inset:0; background:radial-gradient(ellipse at 30% 70%, var(--accent-bg) 0%, transparent 50%), radial-gradient(ellipse at 70% 20%, var(--accent-bg) 0%, transparent 40%); pointer-events:none; z-index:0; }
+
+        .app { position:relative; z-index:10; width:100%; min-height:100vh; display:flex; flex-direction:column; align-items:center; }
+
+        .header { width:100%; display:flex; flex-direction:column; align-items:center; padding-top:80px; padding-bottom:24px; position:relative; animation:headerReveal 0.8s var(--ease) 0.2s forwards; opacity:0; }
+        @keyframes headerReveal { from { opacity:0; transform:translateY(-12px); } to { opacity:1; transform:translateY(0); } }
+        .header::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:60px; height:1px; background:var(--border-strong); }
+
+        .logo-mark { width:36px; height:36px; position:relative; margin-bottom:16px; }
+        .logo-mark .sq1 { position:absolute; inset:0; border:1.5px solid var(--border-strong); border-radius:6px; transform:rotate(45deg); transition:transform 0.8s var(--ease-spring); }
+        .logo-mark .sq2 { position:absolute; inset:8px; border:1px solid var(--accent); border-radius:3px; transform:rotate(45deg); transition:transform 0.8s var(--ease-spring) 0.1s; }
+        .logo-mark:hover .sq1 { transform:rotate(135deg); }
+        .logo-mark:hover .sq2 { transform:rotate(-45deg); }
+
+        .LLM { font-family:'Instrument Serif',serif; font-size:2.4rem; font-weight:400; letter-spacing:8px; color:var(--text); text-transform:uppercase; }
+        .intro { margin-top:8px; font-size:0.62rem; font-weight:400; letter-spacing:4px; text-transform:uppercase; color:var(--text-tertiary); }
+
+        .top-controls { position:fixed; top:20px; right:20px; display:flex; gap:8px; z-index:500; }
+        .icon-btn { width:40px; height:40px; border-radius:50%; border:1px solid var(--border); background:var(--bg-surface); color:var(--text-secondary); cursor:none; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-sm); transition:all 0.3s var(--ease); animation:btnReveal 0.5s var(--ease) 0.6s forwards; opacity:0; }
+        @keyframes btnReveal { from { opacity:0; transform:translateY(-8px) scale(0.9); } to { opacity:1; transform:translateY(0) scale(1); } }
+        .icon-btn:hover { border-color:var(--accent); color:var(--accent); transform:scale(1.05); }
+        .icon-btn svg { width:18px; height:18px; fill:currentColor; transition:transform 0.5s var(--ease); }
+        .icon-btn:hover svg { transform:rotate(30deg); }
+
+        .chat-container { width:100%; max-width:700px; margin:40px auto 160px; padding:0 20px; }
+
+        .chat-message { display:flex; flex-direction:column; gap:14px; margin-bottom:28px; animation:messageSlideIn 0.5s var(--ease) forwards; opacity:0; transform:translateY(16px); }
+        @keyframes messageSlideIn { to { opacity:1; transform:translateY(0); } }
+
+        .message-user { padding:14px 20px; border-radius:var(--radius-md); background:var(--text); color:var(--bg); align-self:flex-end; max-width:78%; font-size:0.88rem; line-height:1.65; font-weight:300; }
+        .message-user .message-label { font-size:0.5rem; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.35); display:block; margin-bottom:6px; font-weight:500; }
+        .message-user .user-text { white-space:pre-wrap; word-wrap:break-word; }
+
+        .message-ai { align-self:flex-start; max-width:95%; display:flex; flex-direction:column; gap:8px; }
+        .message-ai .message-label { font-size:0.55rem; letter-spacing:2px; text-transform:uppercase; color:var(--text-tertiary); font-weight:500; padding-left:2px; display:flex; align-items:center; gap:10px; }
+        .message-ai .message-label::after { content:''; flex:1; height:1px; background:var(--border); max-width:60px; }
+
+        .markdown-body { font-size:0.88rem; line-height:1.85; color:var(--text); font-weight:350; padding:22px 26px; background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--radius-md); position:relative; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 { font-family:'Instrument Serif',serif; margin:24px 0 10px; font-weight:400; color:var(--text); }
+        .markdown-body h1:first-child, .markdown-body h2:first-child, .markdown-body h3:first-child { margin-top:0; }
+        .markdown-body h1 { font-size:1.5rem; }
+        .markdown-body h2 { font-size:1.2rem; }
+        .markdown-body h3 { font-size:1.05rem; }
+        .markdown-body p { margin:12px 0; }
+        .markdown-body p:first-child { margin-top:0; }
+        .markdown-body p:last-child { margin-bottom:0; }
+        .markdown-body ul, .markdown-body ol { padding-left:20px; margin:12px 0; }
+        .markdown-body li { margin:6px 0; line-height:1.7; }
+        .markdown-body code { background:var(--bg-elevated); padding:2px 7px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:0.82em; color:var(--accent); border:1px solid var(--border); }
+        .markdown-body pre { background:#1e1c19; color:#e8e4de; padding:18px 20px; border-radius:var(--radius-sm); overflow:auto; margin:16px 0; font-family:'JetBrains Mono',monospace; font-size:0.82rem; line-height:1.65; border:1px solid #2c2825; position:relative; }
+        [data-theme="dark"] .markdown-body pre { background:#0e0d0b; border-color:var(--border-strong); }
+        .markdown-body pre code { background:none; padding:0; border:none; color:inherit; font-size:inherit; }
+        .markdown-body pre .copy-btn { position:absolute; top:8px; right:8px; padding:4px 10px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); border-radius:4px; color:rgba(255,255,255,0.5); font-size:0.6rem; letter-spacing:1px; text-transform:uppercase; cursor:none; font-family:'DM Sans',sans-serif; font-weight:500; transition:all 0.2s var(--ease); opacity:0; }
+        .markdown-body pre:hover .copy-btn { opacity:1; }
+        .markdown-body pre .copy-btn:hover { background:rgba(255,255,255,0.15); color:rgba(255,255,255,0.8); }
+        .markdown-body pre .copy-btn.copied { background:rgba(139,111,71,0.3); color:#e8e4de; }
+        .markdown-body table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.84rem; }
+        .markdown-body td, .markdown-body th { border:1px solid var(--border); padding:8px 12px; text-align:left; }
+        .markdown-body th { background:var(--bg-elevated); font-weight:600; }
+        .markdown-body a { color:var(--accent); text-decoration:none; border-bottom:1px solid transparent; transition:border-color 0.15s; }
+        .markdown-body a:hover { border-bottom-color:var(--accent); }
+        .markdown-body strong { font-weight:600; }
+        .markdown-body em { font-style:italic; color:var(--text-secondary); }
+        .markdown-body blockquote { border-left:2px solid var(--accent); padding-left:16px; margin:16px 0; color:var(--text-secondary); font-style:italic; font-family:'Instrument Serif',serif; font-size:1.05rem; }
+        .markdown-body hr { border:none; border-top:1px solid var(--border); margin:20px 0; }
+        .markdown-body ::selection { background:rgba(139,111,71,0.2); color:var(--text); }
+        .markdown-body pre ::selection { background:rgba(196,164,108,0.25); color:#e8e4de; }
+
+        /* Fixed details/summary styling */
+        .markdown-body details { color:var(--text); margin:8px 0; padding:10px 14px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-sm); }
+        .markdown-body details summary { cursor:pointer; font-weight:500; color:var(--accent); font-family:'JetBrains Mono',monospace; font-size:0.82rem; padding:4px 0; user-select:none; }
+        .markdown-body details summary:hover { color:var(--accent-light); }
+        .markdown-body details[open] summary { margin-bottom:8px; border-bottom:1px solid var(--border); padding-bottom:8px; }
+        .markdown-body details pre { margin:8px 0 0; background:var(--bg); border-color:var(--border); }
+        .markdown-body details .detail-content { color:var(--text); line-height:1.6; font-size:0.82rem; white-space:pre-wrap; word-wrap:break-word; }
+
+        .streaming-cursor { display:inline-block; width:2px; height:1.15em; background:var(--accent); margin-left:2px; vertical-align:text-bottom; animation:cursorBlink 0.7s step-end infinite; }
+        @keyframes cursorBlink { 0%,100% { opacity:1; } 50% { opacity:0; } }
+
+        .typing { display:flex; gap:5px; align-items:center; padding:16px 22px; background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--radius-md); width:fit-content; }
+        .typing span { width:6px; height:6px; border-radius:50%; background:var(--text-tertiary); animation:typingDot 1.4s var(--ease) infinite; }
+        .typing span:nth-child(2) { animation-delay:0.2s; }
+        .typing span:nth-child(3) { animation-delay:0.4s; }
+        @keyframes typingDot { 0%,60%,100% { opacity:0.2; transform:translateY(0) scale(1); } 30% { opacity:1; transform:translateY(-5px) scale(1.2); } }
+
+        /* Search status indicators */
+        .search-status { display:flex; flex-direction:column; gap:6px; padding:14px 18px; background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--radius-md); font-size:0.78rem; }
+        .search-item { display:flex; align-items:center; gap:8px; color:var(--text-secondary); font-family:'JetBrains Mono',monospace; font-size:0.72rem; }
+        .search-item .dot { width:6px; height:6px; border-radius:50%; background:var(--text-tertiary); transition:all 0.3s var(--ease); flex-shrink:0; }
+        .search-item.active .dot { background:var(--accent); animation:dotPulse 1.2s var(--ease) infinite; }
+        .search-item.done .dot { background:#4caf50; animation:none; }
+        .search-item .label { flex:1; }
+        .search-item .count { color:var(--accent); font-weight:500; }
+        @keyframes dotPulse { 0%,100% { transform:scale(1); opacity:1; } 50% { transform:scale(1.4); opacity:0.6; } }
+
+        /* Thinking indicator */
+        .thinking-block { padding:10px 16px; background:var(--accent-bg); border:1px solid var(--border); border-radius:var(--radius-sm); font-size:0.78rem; color:var(--text-secondary); font-style:italic; margin:4px 0; border-left:3px solid var(--accent); }
+
+        /* Action card */
+        .action-card { margin:6px 0; padding:8px 12px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:6px; font-size:0.78rem; }
+        .action-card summary { cursor:pointer; font-weight:500; color:var(--accent); font-family:'JetBrains Mono',monospace; font-size:0.78rem; padding:4px 0; user-select:none; list-style:none; display:flex; align-items:center; gap:6px; }
+        .action-card summary::-webkit-details-marker { display:none; }
+        .action-card summary::before { content:'\25B6'; font-size:0.6rem; transition:transform 0.2s var(--ease); }
+        .action-card[open] summary::before { transform:rotate(90deg); }
+        .action-card pre { margin:8px 0 0; padding:8px; background:var(--bg); border:1px solid var(--border); border-radius:4px; font-size:0.72rem; overflow-x:auto; white-space:pre-wrap; color:var(--text); }
+        .action-card .action-status { font-size:0.68rem; color:var(--text-tertiary); margin-top:4px; }
+
+        /* Clickable choice buttons (Plan mode) */
+        .choice-container { display:flex; flex-direction:column; gap:10px; margin:12px 0; }
+        .choice-question { font-size:0.88rem; color:var(--text); font-weight:500; margin-bottom:4px; }
+        .choice-options { display:flex; flex-wrap:wrap; gap:8px; }
+        .choice-pill { padding:8px 18px; border-radius:100px; border:1px solid var(--border); background:var(--bg-surface); color:var(--text-secondary); font-size:0.8rem; font-family:'DM Sans',sans-serif; font-weight:400; cursor:none; transition:all 0.25s var(--ease); user-select:none; }
+        .choice-pill:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-bg); transform:translateY(-1px); }
+        .choice-pill.selected { background:var(--accent); color:var(--bg); border-color:var(--accent); }
+        .choice-pill.multi { position:relative; padding-left:28px; }
+        .choice-pill.multi::before { content:''; position:absolute; left:10px; top:50%; transform:translateY(-50%); width:14px; height:14px; border-radius:3px; border:1.5px solid var(--border); transition:all 0.2s var(--ease); }
+        .choice-pill.multi.selected::before { background:var(--bg); border-color:var(--bg); }
+
+        .input-container { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); width:92%; max-width:660px; display:flex; align-items:flex-end; gap:8px; background:var(--bg-surface); padding:8px 8px 8px 20px; border-radius:var(--radius-xl); border:1px solid var(--border); box-shadow:var(--shadow-md); z-index:100; transition:border-color 0.3s var(--ease), box-shadow 0.3s var(--ease); animation:inputSlideUp 0.6s var(--ease) 0.5s forwards; opacity:0; }
+        @keyframes inputSlideUp { from { opacity:0; transform:translateX(-50%) translateY(24px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+        .input-container:focus-within { border-color:var(--accent); box-shadow:var(--shadow-md), 0 0 0 3px var(--accent-bg); }
+
+        .text-input { flex:1; padding:10px 0; font-size:0.88rem; font-family:'DM Sans',sans-serif; font-weight:300; background:transparent; border:none; outline:none; color:var(--text); resize:none; min-height:22px; max-height:140px; line-height:1.5; white-space:pre-wrap; word-wrap:break-word; overflow-x:hidden; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
+        .text-input::placeholder { color:var(--text-tertiary); font-style:italic; font-family:'Instrument Serif',serif; font-size:0.95rem; }
+
+        .submit-btn { padding:10px 22px; background:var(--text); border:none; border-radius:var(--radius-lg); color:var(--bg); cursor:none; font-family:'DM Sans',sans-serif; font-size:0.65rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; transition:all 0.3s var(--ease); flex-shrink:0; }
+        .submit-btn:hover { background:var(--accent); }
+        .submit-btn:active { transform:scale(0.96); }
+
+        .reasoning-toggle { width:36px; height:36px; border-radius:50%; border:1px solid var(--border); background:transparent; color:var(--text-tertiary); cursor:none; display:flex; align-items:center; justify-content:center; transition:all 0.3s var(--ease); flex-shrink:0; position:relative; }
+        .reasoning-toggle:hover { border-color:var(--accent); color:var(--accent); }
+        .reasoning-toggle.active { background:var(--accent-bg); border-color:var(--accent); color:var(--accent); }
+        .reasoning-toggle svg { width:16px; height:16px; fill:currentColor; transition:transform 0.3s var(--ease-spring); }
+        .reasoning-toggle.active svg { transform:scale(1.1); }
+        .reasoning-toggle .reasoning-dot { position:absolute; top:4px; right:4px; width:6px; height:6px; border-radius:50%; background:var(--accent); opacity:0; transition:opacity 0.3s; }
+        .reasoning-toggle.active .reasoning-dot { opacity:1; animation:dotPulse 2s var(--ease) infinite; }
+
+        .toast-container { position:fixed; top:80px; right:20px; z-index:99999; display:flex; flex-direction:column; gap:8px; }
+        .toast { background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 18px; font-size:0.75rem; color:var(--text-secondary); box-shadow:var(--shadow-md); animation:toastSlideIn 0.35s var(--ease) forwards; font-weight:400; }
+        .toast.removing { animation:toastSlideOut 0.3s var(--ease) forwards; }
+        @keyframes toastSlideIn { from { opacity:0; transform:translateX(20px) scale(0.95); } to { opacity:1; transform:translateX(0) scale(1); } }
+        @keyframes toastSlideOut { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(20px); } }
+
+        /* Prompt improve indicator */
+        .prompt-improved { padding:10px 16px; background:var(--accent-bg); border:1px solid var(--border); border-radius:var(--radius-sm); font-size:0.78rem; margin:6px 0; }
+        .prompt-improved .label { font-weight:600; color:var(--accent); font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+        .prompt-improved .text { color:var(--text-secondary); line-height:1.5; }
+
+        /* Web search result cards */
+        .web-results { display:flex; flex-direction:column; gap:8px; margin:8px 0; }
+        .web-card { padding:10px 14px; background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--radius-sm); transition:all 0.2s var(--ease); }
+        .web-card:hover { border-color:var(--accent); }
+        .web-card .web-title { font-size:0.82rem; font-weight:500; color:var(--accent); margin-bottom:4px; text-decoration:none; display:block; }
+        .web-card .web-title:hover { text-decoration:underline; }
+        .web-card .web-url { font-size:0.68rem; color:var(--text-tertiary); font-family:'JetBrains Mono',monospace; word-break:break-all; margin-bottom:4px; }
+        .web-card .web-snippet { font-size:0.76rem; color:var(--text-secondary); line-height:1.5; }
+
+        .overlay { opacity:0; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.1); backdrop-filter:blur(4px); z-index:998; pointer-events:none; transition:opacity 0.3s var(--ease); }
+        .overlay.active { opacity:1; pointer-events:all; }
+
+        .skills-panel { position:fixed; top:0; right:0; width:380px; height:100vh; background:var(--bg-surface); color:var(--text); padding:28px 24px; box-shadow:var(--shadow-lg); transform:translateX(100%); transition:transform 0.4s var(--ease); z-index:1000; overflow-y:auto; border-left:1px solid var(--border); }
+        .skills-panel::-webkit-scrollbar { width:4px; }
+        .skills-panel::-webkit-scrollbar-track { background:transparent; }
+        .skills-panel::-webkit-scrollbar-thumb { background:var(--border-strong); border-radius:2px; }
+        .skills-panel.open { transform:translateX(0); }
+        .skills-panel h2 { font-family:'Instrument Serif',serif; font-size:1.2rem; font-weight:400; letter-spacing:2px; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:14px; margin:0 0 16px; text-transform:uppercase; }
+        .skills-panel .close-btn { position:absolute; top:20px; right:18px; background:var(--bg-elevated); border:none; color:var(--text-secondary); width:30px; height:30px; border-radius:50%; font-size:14px; cursor:none; transition:all 0.3s var(--ease); display:flex; align-items:center; justify-content:center; }
+        .skills-panel .close-btn:hover { background:var(--text); color:var(--bg); }
+        .skills-panel .add-section { margin-top:20px; display:flex; flex-direction:column; gap:10px; }
+        .skills-panel .add-section textarea { width:100%; padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:0.8rem; font-family:'JetBrains Mono',monospace; font-weight:300; resize:vertical; min-height:70px; transition:all 0.3s var(--ease); line-height:1.5; }
+        .skills-panel .add-section textarea:focus { outline:none; border-color:var(--accent); background:var(--bg-surface); }
+        .skills-panel .add-section textarea::placeholder { color:var(--text-tertiary); font-style:italic; font-family:'Instrument Serif',serif; font-size:0.88rem; }
+        .skills-panel .add-section .button-row { display:flex; gap:6px; }
+        .skills-panel .add-section button { padding:8px 14px; border:1px solid var(--border); border-radius:var(--radius-sm); cursor:none; font-weight:500; transition:all 0.3s var(--ease); font-family:'DM Sans',sans-serif; font-size:0.65rem; letter-spacing:1px; text-transform:uppercase; background:var(--bg); color:var(--text-secondary); flex:1; }
+        .skills-panel .add-section button:hover { border-color:var(--border-strong); }
+        .skills-panel .add-section .save-btn { background:var(--text); border-color:var(--text); color:var(--bg); }
+        .skills-panel .add-section .save-btn:hover { background:var(--accent); border-color:var(--accent); }
+        .skills-panel .add-section .file-input { width:100%; padding:10px; border:1px dashed var(--border-strong); border-radius:var(--radius-sm); background:transparent; color:var(--text-secondary); font-size:0.75rem; transition:all 0.3s var(--ease); }
+        .skills-panel .add-section .file-input:hover { border-color:var(--accent); }
+        .skills-panel .empty-msg { color:var(--text-tertiary); text-align:center; margin:36px 0; font-style:italic; font-size:0.9rem; font-family:'Instrument Serif',serif; }
+        .panel-footer { margin-top:16px; padding-top:14px; border-top:1px solid var(--border); font-size:0.7rem; color:var(--text-tertiary); }
+
+        ::-webkit-scrollbar { width:5px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:var(--border-strong); border-radius:3px; }
+        ::selection { background:rgba(139,111,71,0.15); color:var(--text); }
+        :focus-visible { outline:2px solid var(--accent); outline-offset:2px; border-radius:2px; }
+        .input-container:focus-within { outline:none; }
+
+        .page-wrapper { animation:pageFadeIn 0.8s var(--ease) forwards; }
+        @keyframes pageFadeIn { from { opacity:0; } to { opacity:1; } }
+
+        .files-panel { position:fixed; top:0; left:0; width:340px; height:100vh; background:var(--bg-surface); color:var(--text); padding:28px 20px; box-shadow:var(--shadow-lg); transform:translateX(-100%); transition:transform 0.4s var(--ease); z-index:1000; overflow-y:auto; border-right:1px solid var(--border); }
+        .files-panel::-webkit-scrollbar { width:4px; }
+        .files-panel::-webkit-scrollbar-track { background:transparent; }
+        .files-panel::-webkit-scrollbar-thumb { background:var(--border-strong); border-radius:2px; }
+        .files-panel.open { transform:translateX(0); }
+        .files-panel h2 { font-family:'Instrument Serif',serif; font-size:1.2rem; font-weight:400; letter-spacing:2px; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:14px; margin:0 0 12px; text-transform:uppercase; }
+        .files-panel .close-btn { position:absolute; top:20px; right:18px; background:var(--bg-elevated); border:none; color:var(--text-secondary); width:30px; height:30px; border-radius:50%; font-size:14px; cursor:pointer; transition:all 0.3s var(--ease); display:flex; align-items:center; justify-content:center; }
+        .files-panel .close-btn:hover { background:var(--text); color:var(--bg); }
+        .files-toolbar { display:flex; gap:6px; margin-bottom:10px; }
+        .files-path-input { width:100%; padding:7px 10px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text); font-family:'JetBrains Mono',monospace; font-size:0.72rem; outline:none; margin-bottom:8px; transition:border-color 0.2s; }
+        .files-path-input:focus { border-color:var(--accent); }
+        .files-path-input::placeholder { color:var(--text-tertiary); }
+        .files-tool-btn { padding:6px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--bg); color:var(--text-secondary); font-size:0.65rem; font-family:'DM Sans',sans-serif; font-weight:500; letter-spacing:0.5px; text-transform:uppercase; cursor:pointer; transition:all 0.3s var(--ease); }
+        .files-tool-btn:hover { border-color:var(--border-strong); color:var(--text); }
+        .files-breadcrumb { font-size:0.7rem; color:var(--text-tertiary); padding:6px 0; border-bottom:1px solid var(--border); margin-bottom:8px; font-family:'JetBrains Mono',monospace; word-break:break-all; }
+        .files-breadcrumb span { cursor:pointer; transition:color 0.2s; }
+        .files-breadcrumb span:hover { color:var(--accent); }
+        .files-tree { font-size:0.8rem; }
+        .file-item { display:flex; align-items:center; gap:8px; padding:7px 10px; border-radius:6px; cursor:pointer; transition:all 0.2s var(--ease); color:var(--text-secondary); user-select:none; }
+        .file-item:hover { background:var(--bg-hover); color:var(--text); }
+        .file-item.active { background:var(--accent-bg); color:var(--accent); }
+        .file-item .file-icon { width:16px; height:16px; flex-shrink:0; opacity:0.6; }
+        .file-item .file-name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .file-item .file-size { font-size:0.65rem; color:var(--text-tertiary); font-family:'JetBrains Mono',monospace; }
+
+        .file-editor-overlay { display:none; position:fixed; inset:0; z-index:5000; background:rgba(0,0,0,0.4); backdrop-filter:blur(8px); }
+        .file-editor-overlay.active { display:flex; align-items:center; justify-content:center; }
+        .file-editor { width:90%; max-width:900px; height:80vh; background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); display:flex; flex-direction:column; overflow:hidden; animation:editorSlideIn 0.3s var(--ease); }
+        @keyframes editorSlideIn { from { opacity:0; transform:translateY(20px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+        .file-editor-header { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--border); background:var(--bg-elevated); }
+        .file-editor-name { font-family:'JetBrains Mono',monospace; font-size:0.82rem; color:var(--text); font-weight:500; }
+        .file-editor-actions { display:flex; gap:6px; }
+        .file-editor-btn { padding:6px 14px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text-secondary); font-size:0.68rem; font-family:'DM Sans',sans-serif; font-weight:500; letter-spacing:0.5px; text-transform:uppercase; cursor:pointer; transition:all 0.2s var(--ease); }
+        .file-editor-btn:hover { border-color:var(--border-strong); color:var(--text); }
+        .file-editor-btn:first-child { background:var(--text); color:var(--bg); border-color:var(--text); }
+        .file-editor-btn:first-child:hover { background:var(--accent); border-color:var(--accent); }
+        .file-editor-delete:hover { background:#c0392b; border-color:#c0392b; color:#fff; }
+        .file-editor-textarea { flex:1; width:100%; padding:16px 20px; border:none; outline:none; background:var(--bg); color:var(--text); font-family:'JetBrains Mono',monospace; font-size:0.82rem; line-height:1.7; resize:none; tab-size:4; }
+        .file-editor-textarea.hidden { display:none; }
+        .file-editor-cm.hidden { display:none; }
+        .file-editor-cm { flex:1; overflow:hidden; }
+        .file-editor-cm .CodeMirror { height:100%; font-family:'JetBrains Mono',monospace; font-size:0.82rem; line-height:1.7; }
+        .file-editor-preview { display:none; flex:1; padding:20px; overflow-y:auto; background:var(--bg); }
+        .file-editor-preview.active { display:block; }
+        .file-editor-toggle { padding:8px 20px; border-top:1px solid var(--border); }
+
+        @media (max-width:700px) {
+            .LLM { font-size:1.8rem; letter-spacing:5px; }
+            .intro { font-size:0.58rem; letter-spacing:2px; }
+            .chat-container { padding:0 14px; margin-top:20px; }
+            .input-container { width:94%; padding:6px 6px 6px 14px; gap:6px; bottom:16px; }
+            .submit-btn { padding:9px 14px; font-size:0.6rem; }
+            .reasoning-toggle { width:32px; height:32px; }
+            .skills-panel { width:100%; }
+            .message-user { max-width:88%; }
+            .message-ai { max-width:96%; }
+            .welcome-title { font-size:2rem; letter-spacing:8px; }
+            .welcome-tagline { font-size:0.55rem; letter-spacing:3px; }
+            .top-controls { top:14px; right:14px; }
+            .icon-btn { width:36px; height:36px; }
         }
     </style>
 </head>
 <body>
     <div class="welcome-overlay" id="welcomeOverlay">
         <div class="welcome-content">
-            <div class="welcome-logo">
-                <div class="logo-square"></div>
-                <div class="logo-inner"></div>
-            </div>
+            <div class="welcome-logo"><div class="logo-square"></div><div class="logo-inner"></div></div>
             <h1 class="welcome-title">LLM-WIKI</h1>
             <p class="welcome-tagline">The best LLM for coding</p>
             <div class="welcome-bar"><div class="welcome-bar-inner"></div></div>
@@ -1590,24 +373,15 @@
 
     <div class="app page-wrapper">
         <div class="header">
-            <div class="logo-mark">
-                <div class="sq1"></div>
-                <div class="sq2"></div>
-            </div>
+            <div class="logo-mark"><div class="sq1"></div><div class="sq2"></div></div>
             <h1 class="LLM">LLM-WIKI</h1>
             <p class="intro">The best LLM for coding</p>
         </div>
-
         <div class="chat-container" id="chat"></div>
-
         <form class="input-container" id="form">
             <textarea class="text-input" id="query" placeholder="Ask anything..." required autocomplete="off" rows="1"></textarea>
-            <button class="reasoning-toggle" id="reasoningToggle" type="button" title="Toggle reasoning mode">
+            <button class="reasoning-toggle" id="reasoningToggle" type="button" title="Reasoning mode">
                 <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" /></svg>
-                <div class="reasoning-dot"></div>
-            </button>
-            <button class="reasoning-toggle" id="agentToggle" type="button" title="Agent mode (execute commands, read/write files)">
-                <svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
                 <div class="reasoning-dot"></div>
             </button>
             <button class="submit-btn" type="submit">Send</button>
@@ -1617,6 +391,12 @@
     <div class="top-controls">
         <button class="icon-btn" id="filesToggle" aria-label="File manager">
             <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+        </button>
+        <button class="icon-btn" id="modeToggle" aria-label="Agent mode" title="Build mode">
+            <svg viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
+        </button>
+        <button class="icon-btn" id="webSearchToggle" aria-label="Web search" title="Web search">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
         </button>
         <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">
             <svg id="themeIcon" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.48-.04-.96-.12-1.43a5.4 5.4 0 0 1-4.49-4.49A7.96 7.96 0 0 1 12 3z" /></svg>
@@ -1636,6 +416,7 @@
             <button class="files-tool-btn" id="filesNewFolder" title="New folder">+ Folder</button>
             <button class="files-tool-btn" id="filesRefresh" title="Refresh">&#8635;</button>
         </div>
+        <input class="files-path-input" id="filesPathInput" type="text" placeholder="Enter path (e.g. C:/)" spellcheck="false">
         <div class="files-breadcrumb" id="filesBreadcrumb"></div>
         <div class="files-tree" id="filesTree"></div>
     </div>
@@ -1651,7 +432,8 @@
                     <button class="file-editor-btn" id="editorClose">&times;</button>
                 </div>
             </div>
-            <textarea class="file-editor-textarea" id="editorContent" spellcheck="false"></textarea>
+            <div class="file-editor-cm" id="editorCm"></div>
+            <textarea class="file-editor-textarea hidden" id="editorContent" spellcheck="false"></textarea>
             <div class="file-editor-preview" id="editorPreview"></div>
             <div class="file-editor-toggle">
                 <button class="file-editor-btn" id="editorToggleView">Preview</button>
@@ -1662,7 +444,6 @@
     <div class="skills-panel" id="skillsPanel">
         <button class="close-btn" id="closePanel" aria-label="Close panel">&times;</button>
         <h2>Skills</h2>
-        <div id="skillsList"></div>
         <div class="add-section">
             <textarea id="skillInput" placeholder="Paste skill description here..."></textarea>
             <input class="file-input" id="skillFile" type="file" accept=".zip,.md,.txt,.json,.skill">
@@ -1676,17 +457,38 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/theme/material-darker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/hint/show-hint.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/markdown/markdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/gfm/gfm.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/selection/active-line.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/fold/foldcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/fold/foldgutter.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/fold/foldgutter.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/fold/brace-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/fold/indent-fold.min.js"></script>
     <script>
         const SKILLS_API = "http://127.0.0.1:8000/api/skills";
         const UPLOAD_API = "http://127.0.0.1:8000/api/skills/upload";
         const STREAM_API = "http://127.0.0.1:8000/api/search/stream";
-        const AGENT_API = "http://127.0.0.1:8000/api/agent";
+        const AGENT_API = "http://127.0.0.1:8000/api/agent/stream";
+        const PROMPT_IMPROVE_API = "http://127.0.0.1:8000/api/prompt/improve";
+        const WEB_SEARCH_API = "http://127.0.0.1:8000/api/search/web";
 
         const skillsPanel = document.getElementById("skillsPanel");
         const overlay = document.getElementById("overlay");
         const settingsToggle = document.getElementById("settingsToggle");
         const closePanelBtn = document.getElementById("closePanel");
-        const skillsList = document.getElementById("skillsList");
         const skillInput = document.getElementById("skillInput");
         const skillFile = document.getElementById("skillFile");
         const saveBtn = document.getElementById("saveSkill");
@@ -1694,7 +496,8 @@
         const cancelBtn = document.getElementById("cancelSkill");
         const skillCountSpan = document.getElementById("skillCount");
         const reasoningToggle = document.getElementById("reasoningToggle");
-        const agentToggle = document.getElementById("agentToggle");
+        const webSearchToggle = document.getElementById("webSearchToggle");
+        const modeToggle = document.getElementById("modeToggle");
         const form = document.getElementById("form");
         const input = document.getElementById("query");
         const chat = document.getElementById("chat");
@@ -1707,16 +510,13 @@
         let cursorX = 0, cursorY = 0;
         let ringX = 0, ringY = 0;
         let reasoningMode = false;
-        let agentMode = false;
+        let improveMode = true;
+        let webSearchMode = false;
+        let agentMode = true;
+        let agentModeValue = "build";
         let isStreaming = false;
+        let chatHistory = [];
         const isDesktop = !!(window.pywebview || window.external || navigator.userAgent.toLowerCase().includes("pywebview"));
-
-        if (isDesktop) {
-            agentMode = true;
-            agentToggle.style.display = "none";
-        } else {
-            agentToggle.style.display = "none";
-        }
         let welcomeDone = false;
 
         const sunPath = "M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0-5v2m0 16v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M2 12h2m16 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42";
@@ -1724,102 +524,86 @@
 
         function getTheme() { return localStorage.getItem("theme") || "light"; }
         function setTheme(t) {
-        document.documentElement.setAttribute("data-theme", t);
-        themeIcon.querySelector("path").setAttribute("d", t === "dark" ? sunPath : moonPath);
-        localStorage.setItem("theme", t);
+            document.documentElement.setAttribute("data-theme", t);
+            themeIcon.querySelector("path").setAttribute("d", t === "dark" ? sunPath : moonPath);
+            localStorage.setItem("theme", t);
         }
         setTheme(getTheme());
-        themeToggle.addEventListener("click", () => setTheme(getTheme() === "dark" ? "light" : "dark"));
+        themeToggle.addEventListener("click", () => {
+            const newTheme = getTheme() === "dark" ? "light" : "dark";
+            setTheme(newTheme);
+            if (cmEditor) cmEditor.setOption("theme", newTheme === "dark" ? "material-darker" : "default");
+        });
 
         marked.setOptions({ breaks: true, gfm: true });
 
         function dismissWelcome() {
-        if (welcomeDone) return;
-        welcomeDone = true;
-        welcomeOverlay.classList.add("hidden");
-        setTimeout(() => welcomeOverlay.remove(), 900);
+            if (welcomeDone) return;
+            welcomeDone = true;
+            welcomeOverlay.classList.add("hidden");
+            setTimeout(() => welcomeOverlay.remove(), 900);
         }
         welcomeSkip.addEventListener("click", dismissWelcome);
         welcomeOverlay.addEventListener("click", (e) => { if (e.target === welcomeOverlay) dismissWelcome(); });
         setTimeout(dismissWelcome, 3500);
 
         function showToast(message) {
-        const container = document.getElementById("toastContainer");
-        const toast = document.createElement("div");
-        toast.className = "toast";
-        toast.textContent = message;
-        container.appendChild(toast);
-        setTimeout(() => {
-        toast.classList.add("removing");
-        setTimeout(() => toast.remove(), 300);
-        }, 2200);
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+            toast.className = "toast";
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.add("removing"); setTimeout(() => toast.remove(), 300); }, 2200);
         }
 
+        // Cursor
         const cursorMain = document.getElementById("cursorMain");
         const cursorRing = document.getElementById("cursorRing");
-        const trails = [
-        document.getElementById("cursorTrail1"),
-        document.getElementById("cursorTrail2"),
-        document.getElementById("cursorTrail3")
-        ];
+        const trails = [document.getElementById("cursorTrail1"), document.getElementById("cursorTrail2"), document.getElementById("cursorTrail3")];
         let trailPositions = [{x:0,y:0},{x:0,y:0},{x:0,y:0}];
         let mouseMoving = false;
         let moveTimeout;
 
         document.addEventListener("mousemove", (e) => {
-        cursorX = e.clientX;
-        cursorY = e.clientY;
-        cursorMain.style.left = cursorX + "px";
-        cursorMain.style.top = cursorY + "px";
-        cursorMain.style.transform = "translate(-50%, -50%)";
-        mouseMoving = true;
-        trails.forEach(t => t.style.opacity = "0.4");
-        clearTimeout(moveTimeout);
-        moveTimeout = setTimeout(() => {
-        mouseMoving = false;
-        trails.forEach(t => t.style.opacity = "0");
-        }, 150);
+            cursorX = e.clientX; cursorY = e.clientY;
+            cursorMain.style.left = cursorX + "px"; cursorMain.style.top = cursorY + "px";
+            cursorMain.style.transform = "translate(-50%, -50%)";
+            mouseMoving = true;
+            trails.forEach(t => t.style.opacity = "0.4");
+            clearTimeout(moveTimeout);
+            moveTimeout = setTimeout(() => { mouseMoving = false; trails.forEach(t => t.style.opacity = "0"); }, 150);
         });
 
         function animateCursor() {
-        ringX += (cursorX - ringX) * 0.08;
-        ringY += (cursorY - ringY) * 0.08;
-        cursorRing.style.left = ringX + "px";
-        cursorRing.style.top = ringY + "px";
-        cursorRing.style.transform = "translate(-50%, -50%)";
-        if (mouseMoving) {
-        trailPositions[0].x += (cursorX - trailPositions[0].x) * 0.15;
-        trailPositions[0].y += (cursorY - trailPositions[0].y) * 0.15;
-        trailPositions[1].x += (trailPositions[0].x - trailPositions[1].x) * 0.12;
-        trailPositions[1].y += (trailPositions[0].y - trailPositions[1].y) * 0.12;
-        trailPositions[2].x += (trailPositions[1].x - trailPositions[2].x) * 0.1;
-        trailPositions[2].y += (trailPositions[1].y - trailPositions[2].y) * 0.1;
-        const sizes = [6, 4, 3];
-        const opacities = [0.3, 0.2, 0.1];
-        trails.forEach((t, i) => {
-        t.style.left = trailPositions[i].x + "px";
-        t.style.top = trailPositions[i].y + "px";
-        t.style.transform = "translate(-50%, -50%)";
-        t.style.width = sizes[i] + "px";
-        t.style.height = sizes[i] + "px";
-        t.style.opacity = opacities[i];
-        });
-        }
-        requestAnimationFrame(animateCursor);
+            ringX += (cursorX - ringX) * 0.08; ringY += (cursorY - ringY) * 0.08;
+            cursorRing.style.left = ringX + "px"; cursorRing.style.top = ringY + "px";
+            cursorRing.style.transform = "translate(-50%, -50%)";
+            if (mouseMoving) {
+                trailPositions[0].x += (cursorX - trailPositions[0].x) * 0.15;
+                trailPositions[0].y += (cursorY - trailPositions[0].y) * 0.15;
+                trailPositions[1].x += (trailPositions[0].x - trailPositions[1].x) * 0.12;
+                trailPositions[1].y += (trailPositions[0].y - trailPositions[1].y) * 0.12;
+                trailPositions[2].x += (trailPositions[1].x - trailPositions[2].x) * 0.1;
+                trailPositions[2].y += (trailPositions[1].y - trailPositions[2].y) * 0.1;
+                const sizes = [6, 4, 3], opacities = [0.3, 0.2, 0.1];
+                trails.forEach((t, i) => { t.style.left = trailPositions[i].x + "px"; t.style.top = trailPositions[i].y + "px"; t.style.transform = "translate(-50%, -50%)"; t.style.width = sizes[i] + "px"; t.style.height = sizes[i] + "px"; t.style.opacity = opacities[i]; });
+            }
+            requestAnimationFrame(animateCursor);
         }
         animateCursor();
 
-        const hoverSel = "a, button, input, textarea, .skill-item, .submit-btn, .icon-btn, .close-btn, .delete-btn, .reasoning-toggle";
+        const hoverSel = "a, button, input, textarea, .skill-item, .submit-btn, .icon-btn, .close-btn, .delete-btn, .reasoning-toggle, .choice-pill";
         document.addEventListener("mouseover", (e) => { if (e.target.closest(hoverSel)) cursorRing.classList.add("hover"); });
         document.addEventListener("mouseout", (e) => { if (e.target.closest(hoverSel)) cursorRing.classList.remove("hover"); });
         document.addEventListener("mousedown", () => cursorRing.classList.add("click"));
         document.addEventListener("mouseup", () => cursorRing.classList.remove("click"));
 
         function escapeHTML(str) {
-        if (!str) return "";
-        return String(str).replace(/[&<>"]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[m]);
+            if (!str) return "";
+            return String(str).replace(/[&<>"]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[m]);
         }
 
+        // Panels
         function openPanel() { skillsPanel.classList.add("open"); overlay.classList.add("active"); loadSkills(); }
         function closePanelFn() { skillsPanel.classList.remove("open"); overlay.classList.remove("active"); skillInput.value = ""; skillFile.value = ""; }
         settingsToggle.addEventListener("click", openPanel);
@@ -1828,55 +612,31 @@
         document.addEventListener("keydown", (e) => { if (e.key === "Escape" && skillsPanel.classList.contains("open")) closePanelFn(); });
 
         async function loadSkills() {
-        try { const r = await fetch(SKILLS_API); skills = r.ok ? await r.json() : []; skills = Array.isArray(skills) ? skills : []; } catch { skills = []; }
-        renderSkills();
-        }
-
-        function renderSkills() {
-        if (!skills.length) { skillsList.innerHTML = '<div class="empty-msg">No skills yet</div>'; skillCountSpan.textContent = "0"; return; }
-        skillsList.innerHTML = skills.map((s, i) => {
-        const name = s.name || `Skill ${i + 1}`;
-        const content = s.description || s.content || "";
-        const meta = [s.filename ? `file: ${s.filename}` : "", s.source ? `src: ${s.source}` : ""].filter(Boolean).join(" · ");
-        const id = encodeURIComponent(s.filename || s.name || name);
-        return `<div class="skill-item"><div class="skill-header"><span class="skill-name">${escapeHTML(name)}</span><button class="delete-btn" data-id="${id}">Remove</button></div>${meta ? `<div style="font-size:0.65rem;color:var(--text-tertiary);margin-top:4px;">${escapeHTML(meta)}</div>` : ""}<div class="skill-content">${escapeHTML(content)}</div></div>`;
-        }).join("");
-        skillCountSpan.textContent = String(skills.length);
-        document.querySelectorAll(".delete-btn").forEach(btn => { btn.addEventListener("click", async e => { await deleteSkill(e.target.dataset.id); }); });
+            try { const r = await fetch(SKILLS_API); skills = r.ok ? await r.json() : []; skills = Array.isArray(skills) ? skills : []; } catch { skills = []; }
         }
 
         async function saveNewSkill() {
-        const content = skillInput.value.trim();
-        if (!content) { showToast("Enter skill description"); return; }
-        try {
-        const r = await fetch(SKILLS_API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: `Skill ${skills.length + 1}`, content }) });
-        const d = await r.json();
-        if (!r.ok || d.status === "error") throw new Error();
-        skillInput.value = ""; showToast("Skill saved"); await loadSkills();
-        } catch { showToast("Save error"); }
+            const content = skillInput.value.trim();
+            if (!content) { showToast("Enter skill description"); return; }
+            try {
+                const r = await fetch(SKILLS_API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: `Skill ${skills.length + 1}`, content }) });
+                const d = await r.json();
+                if (!r.ok || d.status === "error") throw new Error();
+                skillInput.value = ""; showToast("Skill saved"); await loadSkills();
+            } catch { showToast("Save error"); }
         }
 
         async function uploadSkillFile() {
-        const file = skillFile.files[0];
-        if (!file) { showToast("Choose a file"); return; }
-        const body = new FormData(); body.append("file", file);
-        try {
-        const endpoint = file.name.endsWith('.zip') ? `${SKILLS_API}/upload-zip` : UPLOAD_API;
-        const r = await fetch(endpoint, { method: "POST", body });
-        const d = await r.json();
-        if (!r.ok || d.status === "error") throw new Error();
-        skillFile.value = ""; skillInput.value = ""; showToast("File uploaded"); await loadSkills();
-        } catch { showToast("Upload error"); }
-        }
-
-        async function deleteSkill(id) {
-        if (!id || !confirm("Remove this skill?")) return;
-        try {
-        const r = await fetch(`${SKILLS_API}/${id}`, { method: "DELETE" });
-        const d = await r.json();
-        if (!r.ok || d.status === "error") throw new Error();
-        showToast("Skill removed"); await loadSkills();
-        } catch { showToast("Delete error"); }
+            const file = skillFile.files[0];
+            if (!file) { showToast("Choose a file"); return; }
+            const body = new FormData(); body.append("file", file);
+            try {
+                const endpoint = file.name.endsWith('.zip') ? `${SKILLS_API}/upload-zip` : UPLOAD_API;
+                const r = await fetch(endpoint, { method: "POST", body });
+                const d = await r.json();
+                if (!r.ok || d.status === "error") throw new Error();
+                skillFile.value = ""; skillInput.value = ""; showToast("File uploaded"); await loadSkills();
+            } catch { showToast("Upload error"); }
         }
 
         saveBtn.addEventListener("click", saveNewSkill);
@@ -1884,140 +644,413 @@
         cancelBtn.addEventListener("click", () => { skillInput.value = ""; skillFile.value = ""; skillInput.focus(); });
         skillInput.addEventListener("keydown", e => { if (e.key === "Enter" && e.ctrlKey) { e.preventDefault(); saveNewSkill(); } });
 
-        reasoningToggle.addEventListener("click", () => {
-        reasoningMode = !reasoningMode;
-        reasoningToggle.classList.toggle("active", reasoningMode);
-        showToast(reasoningMode ? "Reasoning enabled" : "Reasoning disabled");
+        // Toggles
+        reasoningToggle.addEventListener("click", () => { reasoningMode = !reasoningMode; reasoningToggle.classList.toggle("active", reasoningMode); showToast(reasoningMode ? "Reasoning ON" : "Reasoning OFF"); });
+
+        webSearchToggle.addEventListener("click", () => { webSearchMode = !webSearchMode; webSearchToggle.classList.toggle("active", webSearchMode); localStorage.setItem("webSearchMode", webSearchMode); showToast(webSearchMode ? "Web search ON" : "Web search OFF"); });
+
+        const modeIcons = {
+            build: '<svg viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>',
+            plan: '<svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>',
+            compose: '<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>'
+        };
+        const modeNames = { build: "Build", plan: "Plan", compose: "Compose" };
+        const modeOrder = ["build", "plan", "compose"];
+
+        function updateModeButton() {
+            modeToggle.innerHTML = modeIcons[agentModeValue];
+            modeToggle.title = modeNames[agentModeValue] + " mode";
+            modeToggle.classList.toggle("active", agentModeValue !== "build");
+        }
+
+        modeToggle.addEventListener("click", () => {
+            const idx = modeOrder.indexOf(agentModeValue);
+            agentModeValue = modeOrder[(idx + 1) % modeOrder.length];
+            agentMode = true;
+            updateModeButton();
+            showToast(`Mode: ${modeNames[agentModeValue]}`);
         });
 
-        if (!isDesktop) {
-            agentToggle.addEventListener("click", () => {
-            agentMode = !agentMode;
-            agentToggle.classList.toggle("active", agentMode);
-            showToast(agentMode ? "Agent mode ON" : "Agent mode OFF");
-            });
-        }
+        updateModeButton();
+
+        // Initialize saved toggles
+        if (localStorage.getItem("webSearchMode") === "true") { webSearchMode = true; webSearchToggle.classList.add("active"); }
 
         function scrollBottom() { requestAnimationFrame(() => { window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }); }); }
 
         function addCopyButtons(box) {
-        const preBlocks = box.querySelectorAll("pre");
-        preBlocks.forEach(pre => {
-        if (pre.querySelector(".copy-btn")) return;
-        const btn = document.createElement("button");
-        btn.className = "copy-btn";
-        btn.textContent = "Copy";
-        btn.addEventListener("click", async () => {
-        const code = pre.querySelector("code");
-        const text = code ? code.textContent : pre.textContent;
-        try {
-        await navigator.clipboard.writeText(text);
-        btn.textContent = "Copied!"; btn.classList.add("copied");
-        setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 1500);
-        } catch { btn.textContent = "Error"; setTimeout(() => btn.textContent = "Copy", 1500); }
-        });
-        pre.appendChild(btn);
-        });
+            box.querySelectorAll("pre").forEach(pre => {
+                if (pre.querySelector(".copy-btn")) return;
+                const btn = document.createElement("button");
+                btn.className = "copy-btn"; btn.textContent = "Copy";
+                btn.addEventListener("click", async () => {
+                    const code = pre.querySelector("code");
+                    const text = code ? code.textContent : pre.textContent;
+                    try { await navigator.clipboard.writeText(text); btn.textContent = "Copied!"; btn.classList.add("copied"); setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 1500); } catch { btn.textContent = "Error"; setTimeout(() => btn.textContent = "Copy", 1500); }
+                });
+                pre.appendChild(btn);
+            });
         }
 
         function createMessage(query) {
-        let label = "LLM";
-        if (agentMode) label = "Agent";
-        else if (reasoningMode) label = "LLM · reasoning";
-        chat.innerHTML += `<div class="chat-message"><div class="message-user"><span class="message-label">You</span><div class="user-text">${escapeHTML(query)}</div></div><div class="message-ai"><span class="message-label">${escapeHTML(label)}</span><div class="markdown-body typing"><span></span><span></span><span></span></div></div></div>`;
-        return chat.lastElementChild.querySelector(".markdown-body");
+            const modeLabels = { build: "Agent · Build", plan: "Agent · Plan", compose: "Agent · Compose" };
+            let label = agentMode ? modeLabels[agentModeValue] || "Agent" : (reasoningMode ? "LLM · reasoning" : "LLM");
+            chat.innerHTML += `<div class="chat-message"><div class="message-user"><span class="message-label">You</span><div class="user-text">${escapeHTML(query)}</div></div><div class="message-ai"><span class="message-label">${escapeHTML(label)}</span><div class="markdown-body typing"><span></span><span></span><span></span></div></div></div>`;
+            return chat.lastElementChild.querySelector(".markdown-body");
         }
 
-        async function streamSearch(query, box) {
-        isStreaming = true;
-        let fullText = "";
-        box.classList.remove("typing");
-        box.innerHTML = '<span class="streaming-cursor"></span>';
-        try {
-        const body = new FormData();
-        body.append("query", query);
-        body.append("reasoning", String(reasoningMode));
-        const response = await fetch(STREAM_API, { method: "POST", body });
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const lines = decoder.decode(value).split("\n");
-        for (const line of lines) {
-        if (!line.startsWith("data: ")) continue;
-        try {
-        const p = JSON.parse(line.slice(6));
-        if (p.error) { box.innerHTML = "Error: " + escapeHTML(p.error); return; }
-        if (p.done) break;
-        if (p.content) { fullText += p.content; box.innerHTML = marked.parse(fullText) + '<span class="streaming-cursor"></span>'; scrollBottom(); }
-        } catch {}
-        }
-        }
-        box.innerHTML = marked.parse(fullText);
-        addCopyButtons(box);
-        scrollBottom();
-        } catch (e) { box.innerHTML = "Error: " + escapeHTML(e.message); }
-        finally { isStreaming = false; }
+        function createSearchStatus() {
+            const statusDiv = document.createElement("div");
+            statusDiv.className = "search-status";
+            statusDiv.innerHTML = `
+                <div class="search-item active" data-source="vector"><div class="dot"></div><span class="label">Searching vector DB...</span></div>
+                <div class="search-item active" data-source="web"><div class="dot"></div><span class="label">Searching web...</span></div>
+                <div class="search-item active" data-source="wikipedia"><div class="dot"></div><span class="label">Checking Wikipedia...</span></div>
+                <div class="search-item active" data-source="skills"><div class="dot"></div><span class="label">Matching skills...</span></div>
+            `;
+            return statusDiv;
         }
 
-        async function streamAgent(query, box) {
-        isStreaming = true;
-        box.classList.remove("typing");
-        box.innerHTML = '<div style="padding:12px;color:var(--text-tertiary);font-size:0.82rem;">Agent is working...</div>';
-        try {
-        const response = await fetch(AGENT_API, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({query})
-        });
-        const data = await response.json();
-        if (data.error) { box.innerHTML = "Error: " + escapeHTML(data.error); return; }
-        let html = "";
-        const actions = data.actions || [];
-        if (actions.length > 0) {
-            html += '<div style="margin-bottom:12px;">';
-            for (const a of actions) {
-                const toolName = a.tool;
-                const args = a.args;
-                const result = a.result;
-                let detail = "";
-                if (toolName === "execute_command") detail = escapeHTML(args.command || "");
-                else if (toolName === "read_file") detail = escapeHTML(args.path || "");
-                else if (toolName === "write_file") detail = escapeHTML(args.path || "");
-                else if (toolName === "list_directory") detail = escapeHTML(args.path || "cwd");
-                else if (toolName === "create_directory") detail = escapeHTML(args.path || "");
-                else if (toolName === "delete_file") detail = escapeHTML(args.path || "");
-                else if (toolName === "search_in_files") detail = escapeHTML(args.query || "");
-                const resultStr = JSON.stringify(result, null, 2);
-                html += `<details style="margin:6px 0;padding:8px 12px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:6px;font-size:0.78rem;"><summary style="cursor:pointer;font-weight:500;color:var(--accent);font-family:'JetBrains Mono',monospace;">${escapeHTML(toolName)}: ${detail}</summary><pre style="margin:8px 0 0;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:4px;font-size:0.72rem;overflow-x:auto;white-space:pre-wrap;">${escapeHTML(resultStr)}</pre></details>`;
+        function markSearchDone(statusDiv, source, count) {
+            const item = statusDiv.querySelector(`[data-source="${source}"]`);
+            if (item) {
+                item.classList.remove("active");
+                item.classList.add("done");
+                const label = item.querySelector(".label");
+                if (source === "vector") label.textContent = "Vector DB";
+                else if (source === "web") label.textContent = `Web (${count || 0} results)`;
+                else if (source === "wikipedia") label.textContent = "Wikipedia";
+                else if (source === "skills") label.textContent = `Skills (${count || 0} matched)`;
             }
-            html += '</div>';
         }
-        if (data.answer) html += marked.parse(data.answer);
-        box.innerHTML = html || '<div style="color:var(--text-tertiary);">No response</div>';
-        addCopyButtons(box);
-        scrollBottom();
-        } catch (e) { box.innerHTML = "Error: " + escapeHTML(e.message); }
-        finally { isStreaming = false; }
+
+        // Web search cards
+        function renderWebCards(results) {
+            if (!results || results.length === 0) return "";
+            let html = '<div class="web-results">';
+            for (const r of results) {
+                html += `<div class="web-card"><a class="web-title" href="${escapeHTML(r.url)}" target="_blank">${escapeHTML(r.title || r.url)}</a><div class="web-url">${escapeHTML(r.url)}</div><div class="web-snippet">${escapeHTML(r.snippet || "")}</div></div>`;
+            }
+            html += "</div>";
+            return html;
+        }
+
+        // Clickable choices for Plan mode
+        function renderChoices(questions) {
+            let html = '<div class="choice-container">';
+            for (const q of questions) {
+                html += `<div class="choice-question">${escapeHTML(q.question)}</div><div class="choice-options">`;
+                for (let i = 0; i < q.options.length; i++) {
+                    html += `<button class="choice-pill" data-question="${escapeHTML(q.question)}" data-option="${escapeHTML(q.options[i])}">${escapeHTML(q.options[i])}</button>`;
+                }
+                html += "</div>";
+            }
+            html += "</div>";
+            return html;
+        }
+
+        // Parse plan mode questions from text
+        function parsePlanQuestions(text) {
+            const questions = [];
+            const lines = text.split("\n");
+            let currentQ = null;
+            for (const line of lines) {
+                const qMatch = line.match(/^(?:\d+[\.\)]\s*|\*\*)?(?:Вопрос|Question)?\*{0,2}\s*:?\s*\*{0,2}(.+\?)\s*$/i);
+                if (qMatch) {
+                    if (currentQ && currentQ.options.length >= 2) questions.push(currentQ);
+                    currentQ = { question: qMatch[1].trim(), options: [] };
+                    continue;
+                }
+                if (currentQ) {
+                    const optMatch = line.match(/^\s*[-\*]\s*\*{0,2}(.+?)\*{0,2}\s*$/);
+                    if (optMatch && optMatch[1].trim().length > 1 && !optMatch[1].includes("?")) {
+                        currentQ.options.push(optMatch[1].trim());
+                    }
+                }
+            }
+            if (currentQ && currentQ.options.length >= 2) questions.push(currentQ);
+            return questions;
+        }
+
+        // Streaming search
+        async function streamSearch(query, box) {
+            isStreaming = true;
+            let fullText = "";
+            let improvedPromptHtml = "";
+            box.classList.remove("typing");
+
+            const statusDiv = createSearchStatus();
+            const answerDiv = document.createElement("div");
+            answerDiv.className = "markdown-body";
+            answerDiv.style.display = "none";
+            box.innerHTML = "";
+            box.appendChild(statusDiv);
+            box.appendChild(answerDiv);
+
+            try {
+                const body = new FormData();
+                body.append("query", query);
+                body.append("reasoning", String(reasoningMode));
+                body.append("improve_prompt", String(improveMode));
+                const response = await fetch(STREAM_API, { method: "POST", body });
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = "";
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split("\n");
+                    buffer = lines.pop();
+                    for (const line of lines) {
+                        if (!line.startsWith("data: ")) continue;
+                        try {
+                            const p = JSON.parse(line.slice(6));
+                            if (p.type === "error") { box.innerHTML = "Error: " + escapeHTML(p.content); return; }
+                            if (p.type === "improved_prompt") { improvedPromptHtml = `<div class="prompt-improved"><div class="label">Improved prompt</div><div class="text">${escapeHTML(p.improved)}</div></div>`; }
+                            if (p.type === "search_done") { markSearchDone(statusDiv, p.source, p.results); }
+                            if (p.type === "answer_chunk") {
+                                fullText += p.content;
+                                answerDiv.style.display = "block";
+                                answerDiv.innerHTML = marked.parse(fullText) + '<span class="streaming-cursor"></span>';
+                                scrollBottom();
+                            }
+                        } catch {}
+                    }
+                }
+
+                if (fullText) {
+                    answerDiv.innerHTML = marked.parse(fullText);
+                    addCopyButtons(answerDiv);
+                } else {
+                    answerDiv.innerHTML = '<p style="color:var(--text-tertiary)">No response</p>';
+                    answerDiv.style.display = "block";
+                }
+                if (improvedPromptHtml) {
+                    const promptDiv = document.createElement("div");
+                    promptDiv.innerHTML = improvedPromptHtml;
+                    box.insertBefore(promptDiv, answerDiv);
+                }
+                scrollBottom();
+            } catch (e) { box.innerHTML = "Error: " + escapeHTML(e.message); }
+            finally { isStreaming = false; }
+        }
+
+        // Streaming agent
+        async function streamAgent(query, box, isFollowUp = false) {
+            isStreaming = true;
+            box.classList.remove("typing");
+
+            const responseDiv = document.createElement("div");
+            responseDiv.style.cssText = "display:flex;flex-direction:column;gap:8px;";
+            if (!isFollowUp) box.innerHTML = "";
+            box.appendChild(responseDiv);
+
+            let thinkingBlock = null;
+            let answerBlock = null;
+            let thinkingText = "";
+            let answerText = "";
+
+            try {
+                const response = await fetch(AGENT_API, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({query, mode: agentModeValue, history: chatHistory})
+                });
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = "";
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split("\n");
+                    buffer = lines.pop();
+                    for (const line of lines) {
+                        if (!line.startsWith("data: ")) continue;
+                        try {
+                            const p = JSON.parse(line.slice(6));
+
+                            if (p.type === "thinking") {
+                                thinkingText += p.content;
+                                if (!thinkingBlock) {
+                                    thinkingBlock = document.createElement("div");
+                                    thinkingBlock.className = "thinking-block";
+                                    responseDiv.appendChild(thinkingBlock);
+                                }
+                                thinkingBlock.textContent = thinkingText.slice(-500);
+                                scrollBottom();
+                            }
+
+                            if (p.type === "action_start") {
+                                const toolName = p.tool;
+                                let detail = "";
+                                if (toolName === "execute_command") detail = escapeHTML(p.args.command || "");
+                                else if (toolName === "read_file") detail = escapeHTML(p.args.path || "");
+                                else if (toolName === "write_file") detail = escapeHTML(p.args.path || "");
+                                else if (toolName === "list_directory") detail = escapeHTML(p.args.path || "cwd");
+                                else if (toolName === "create_directory") detail = escapeHTML(p.args.path || "");
+                                else if (toolName === "delete_file") detail = escapeHTML(p.args.path || "");
+                                else if (toolName === "search_in_files") detail = escapeHTML(p.args.query || "");
+                                else if (toolName === "web_search") detail = escapeHTML(p.args.query || "");
+                                else if (toolName === "search_skills") detail = escapeHTML(p.args.query || "");
+                                else if (toolName === "install_skill") detail = escapeHTML(p.args.skill_name || "");
+                                else if (toolName === "run_python") detail = "Python script";
+                                else if (toolName === "git_command") detail = escapeHTML(p.args.command || "");
+                                else if (toolName === "http_request") detail = escapeHTML(p.args.url || "");
+                                else if (toolName === "download_github_skills") detail = escapeHTML(p.args.repo || "");
+                                else if (toolName === "list_skills") detail = escapeHTML(p.args.category || "all");
+                                else detail = JSON.stringify(p.args);
+
+                                const card = document.createElement("details");
+                                card.className = "action-card";
+                                card.open = true;
+                                card.innerHTML = `<summary>${escapeHTML(toolName)}: ${detail}</summary><div class="action-status">Executing...</div>`;
+                                responseDiv.appendChild(card);
+                                scrollBottom();
+                            }
+
+                            if (p.type === "action_result") {
+                                const cards = responseDiv.querySelectorAll(".action-card");
+                                const lastCard = cards[cards.length - 1];
+                                if (lastCard) {
+                                    const status = lastCard.querySelector(".action-status");
+                                    const resultStr = JSON.stringify(p.result, null, 2);
+                                    if (status) {
+                                        const pre = document.createElement("pre");
+                                        pre.textContent = resultStr;
+                                        status.replaceWith(pre);
+                                    }
+                                    lastCard.open = false;
+                                }
+                            }
+
+                            if (p.type === "answer_chunk") {
+                                answerText += p.content;
+                                if (!answerBlock) {
+                                    answerBlock = document.createElement("div");
+                                    answerBlock.className = "markdown-body";
+                                    responseDiv.appendChild(answerBlock);
+                                }
+                                answerBlock.innerHTML = marked.parse(answerText) + '<span class="streaming-cursor"></span>';
+                                scrollBottom();
+                            }
+
+                            if (p.type === "answer") {
+                                answerText = p.content;
+                                if (!answerBlock) {
+                                    answerBlock = document.createElement("div");
+                                    answerBlock.className = "markdown-body";
+                                    responseDiv.appendChild(answerBlock);
+                                }
+                                answerBlock.innerHTML = marked.parse(answerText);
+                                addCopyButtons(answerBlock);
+                                scrollBottom();
+                            }
+
+                            if (p.type === "done") {
+                                if (answerBlock && answerText) {
+                                    answerBlock.innerHTML = marked.parse(answerText);
+                                    addCopyButtons(answerBlock);
+                                } else if (!answerText && thinkingText) {
+                                    if (!answerBlock) {
+                                        answerBlock = document.createElement("div");
+                                        answerBlock.className = "markdown-body";
+                                        responseDiv.appendChild(answerBlock);
+                                    }
+                                    answerBlock.innerHTML = marked.parse(thinkingText);
+                                    addCopyButtons(answerBlock);
+                                    answerText = thinkingText;
+                                }
+                                if (thinkingBlock) thinkingBlock.remove();
+                            }
+
+                            if (p.type === "error") {
+                                const errDiv = document.createElement("div");
+                                errDiv.className = "markdown-body";
+                                errDiv.style.color = "#c0392b";
+                                errDiv.textContent = "Error: " + p.content;
+                                responseDiv.appendChild(errDiv);
+                            }
+                        } catch {}
+                    }
+                }
+
+                if (answerText) {
+                    chatHistory.push({role: "user", content: query});
+                    chatHistory.push({role: "assistant", content: answerText});
+                    if (chatHistory.length > 40) chatHistory = chatHistory.slice(-40);
+                }
+
+                if (agentModeValue === "plan" && answerText && (answerText.includes("Готов к реализации") || answerText.includes("план готов") || answerText.includes("Готов к"))) {
+                    const actionDiv = document.createElement("div");
+                    actionDiv.style.cssText = "display:flex;gap:8px;margin-top:12px;";
+                    const execBtn = document.createElement("button");
+                    execBtn.className = "submit-btn";
+                    execBtn.textContent = "Реализовать план";
+                    execBtn.addEventListener("click", () => {
+                        agentModeValue = "build";
+                        updateModeButton();
+                        const planText = answerText;
+                        actionDiv.remove();
+                        input.value = "Реализуй этот план:\n\n" + planText;
+                        form.requestSubmit();
+                    });
+                    const cancelBtn = document.createElement("button");
+                    cancelBtn.className = "submit-btn";
+                    cancelBtn.style.cssText = "background:var(--bg-elevated);color:var(--text-secondary);";
+                    cancelBtn.textContent = "Отмена";
+                    cancelBtn.addEventListener("click", () => actionDiv.remove());
+                    actionDiv.appendChild(execBtn);
+                    actionDiv.appendChild(cancelBtn);
+                    responseDiv.appendChild(actionDiv);
+                }
+
+                scrollBottom();
+            } catch (e) { box.innerHTML = "Error: " + escapeHTML(e.message); }
+            finally { isStreaming = false; }
         }
 
         input.addEventListener("input", function() { this.style.height = "auto"; this.style.height = Math.min(this.scrollHeight, 140) + "px"; });
         input.addEventListener("keydown", function(e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); } });
 
         form.addEventListener("submit", async e => {
-        e.preventDefault();
-        const query = input.value.trim();
-        if (!query || isStreaming) return;
-        input.value = ""; input.style.height = "auto";
-        const box = createMessage(query);
-        scrollBottom();
-        if (agentMode) await streamAgent(query, box);
-        else await streamSearch(query, box);
+            e.preventDefault();
+            const query = input.value.trim();
+            if (!query || isStreaming) return;
+            input.value = ""; input.style.height = "auto";
+            const box = createMessage(query);
+            scrollBottom();
+            if (agentMode) await streamAgent(query, box);
+            else await streamSearch(query, box);
         });
 
-        loadSkills();
+        // Handle clickable choices
+        document.addEventListener("click", (e) => {
+            const pill = e.target.closest(".choice-pill");
+            if (pill) {
+                pill.classList.toggle("selected");
+                const question = pill.dataset.question;
+                const option = pill.dataset.option;
+                const isMulti = pill.classList.contains("multi");
 
+                if (!isMulti) {
+                    const container = pill.closest(".choice-options");
+                    if (container) container.querySelectorAll(".choice-pill").forEach(p => { if (p !== pill) p.classList.remove("selected"); });
+                }
+
+                const selected = pill.closest(".choice-container").querySelectorAll(".choice-pill.selected");
+                if (selected.length > 0) {
+                    const answers = Array.from(selected).map(s => s.dataset.option).join(", ");
+                    input.value = answers;
+                    input.focus();
+                }
+            }
+        });
+
+        // Files panel
         const FILES_API = "http://127.0.0.1:8000/api/files";
         const filesPanel = document.getElementById("filesPanel");
         const filesToggle = document.getElementById("filesToggle");
@@ -2027,6 +1060,7 @@
         const filesNewFile = document.getElementById("filesNewFile");
         const filesNewFolder = document.getElementById("filesNewFolder");
         const filesRefresh = document.getElementById("filesRefresh");
+        const filesPathInput = document.getElementById("filesPathInput");
         const fileEditorOverlay = document.getElementById("fileEditorOverlay");
         const editorFileName = document.getElementById("editorFileName");
         const editorContent = document.getElementById("editorContent");
@@ -2040,199 +1074,68 @@
         let currentFilePath = "";
         let currentDir = "";
         let editorMode = "edit";
+        let cmEditor = null;
 
-        function openFilesPanel() { filesPanel.classList.add("open"); overlay.classList.add("active"); loadFiles(""); }
+        function getLangMode(ext) {
+            const map = { ".py": "python", ".js": "javascript", ".jsx": "javascript", ".ts": "javascript", ".tsx": "javascript", ".html": "htmlmixed", ".htm": "htmlmixed", ".css": "css", ".scss": "css", ".json": { name: "javascript", json: true }, ".md": "gfm", ".markdown": "gfm", ".java": "text/x-java", ".c": "text/x-c", ".cpp": "text/x-c++src", ".h": "text/x-c", ".cs": "text/x-csharp", ".xml": "xml", ".yaml": "yaml", ".yml": "yaml", ".sh": "shell", ".bash": "shell", ".bat": "shell", ".sql": "sql", ".rb": "ruby", ".go": "go", ".rs": "rust", ".php": "php", ".swift": "swift" };
+            return map[ext] || "null";
+        }
+
+        function initCodeMirror(content, ext) {
+            const container = document.getElementById("editorCm");
+            if (cmEditor) { cmEditor.toTextArea(); cmEditor = null; }
+            editorContent.value = content;
+            const isDark = getTheme() === "dark";
+            cmEditor = CodeMirror(container, { value: content, mode: getLangMode(ext), theme: isDark ? "material-darker" : "default", lineNumbers: true, matchBrackets: true, autoCloseBrackets: true, styleActiveLine: true, foldGutter: true, gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"], indentUnit: 4, tabSize: 4, indentWithTabs: false, lineWrapping: false, extraKeys: { "Tab": (cm) => cm.replaceSelection("    ", "end"), "Ctrl-S": () => editorSave.click(), "Cmd-S": () => editorSave.click() } });
+            setTimeout(() => cmEditor.refresh(), 10);
+        }
+
+        function openFilesPanel() { filesPanel.classList.add("open"); overlay.classList.add("active"); loadFiles("C:/"); }
         function closeFilesPanelFn() { filesPanel.classList.remove("open"); overlay.classList.remove("active"); }
         filesToggle.addEventListener("click", openFilesPanel);
         closeFilesPanel.addEventListener("click", closeFilesPanelFn);
+        filesPathInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); const val = filesPathInput.value.trim(); if (val) loadFiles(val); } });
 
         async function loadFiles(dir) {
-            currentDir = dir;
-            try {
-                const r = await fetch(`${FILES_API}/tree?path=${encodeURIComponent(dir)}`);
-                const data = await r.json();
-                if (data.error) { filesTree.innerHTML = `<div class="empty-msg">${escapeHTML(data.error)}</div>`; return; }
-                renderBreadcrumb(dir);
-                renderFileTree(data.items || []);
-            } catch { filesTree.innerHTML = '<div class="empty-msg">Error loading</div>'; }
+            currentDir = dir; filesPathInput.value = dir;
+            try { const r = await fetch(`${FILES_API}/tree?path=${encodeURIComponent(dir)}`); const data = await r.json(); if (data.error) { filesTree.innerHTML = `<div class="empty-msg">${escapeHTML(data.error)}</div>`; return; } renderBreadcrumb(dir); renderFileTree(data.items || []); } catch { filesTree.innerHTML = '<div class="empty-msg">Error loading</div>'; }
         }
 
         function renderBreadcrumb(dir) {
             const parts = dir ? dir.split("/").filter(Boolean) : [];
-            let html = '<span data-path="">root</span>';
-            let accumulated = "";
-            for (const part of parts) {
-                accumulated += (accumulated ? "/" : "") + part;
-                const p = accumulated;
-                html += ` / <span data-path="${escapeHTML(p)}">${escapeHTML(part)}</span>`;
-            }
+            let html = ""; let accumulated = "";
+            for (let i = 0; i < parts.length; i++) { const part = parts[i]; accumulated += (accumulated ? "/" : "") + part; const p = accumulated; const sep = (i === 0 && part.endsWith(":")) ? "" : (i > 0 ? " / " : ""); html += `${sep}<span data-path="${escapeHTML(p)}">${escapeHTML(part)}</span>`; }
+            if (!html) html = '<span data-path="C:/">C:</span>';
             filesBreadcrumb.innerHTML = html;
-            filesBreadcrumb.querySelectorAll("span").forEach(s => {
-                s.addEventListener("click", () => loadFiles(s.dataset.path));
-            });
+            filesBreadcrumb.querySelectorAll("span").forEach(s => { s.addEventListener("click", () => loadFiles(s.dataset.path)); });
         }
 
         function renderFileTree(items) {
             if (!items.length) { filesTree.innerHTML = '<div class="empty-msg">Empty folder</div>'; return; }
             filesTree.innerHTML = items.map(item => {
                 const isDir = item.type === "dir";
-                const icon = isDir
-                    ? '<svg class="file-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>'
-                    : '<svg class="file-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h5v7h7v9H6z"/></svg>';
+                const icon = isDir ? '<svg class="file-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>' : '<svg class="file-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h5v7h7v9H6z"/></svg>';
                 const size = isDir ? "" : formatSize(item.size);
                 return `<div class="file-item" data-path="${escapeHTML(item.path)}" data-type="${item.type}">${icon}<span class="file-name">${escapeHTML(item.name)}</span>${size ? `<span class="file-size">${size}</span>` : ""}</div>`;
             }).join("");
-            filesTree.querySelectorAll(".file-item").forEach(el => {
-                el.addEventListener("click", () => {
-                    const p = el.dataset.path;
-                    const t = el.dataset.type;
-                    if (t === "dir") loadFiles(p);
-                    else openFileEditor(p);
-                });
-            });
+            filesTree.querySelectorAll(".file-item").forEach(el => { el.addEventListener("click", () => { const p = el.dataset.path; const t = el.dataset.type; if (t === "dir") loadFiles(p); else openFileEditor(p); }); });
         }
 
-        function formatSize(b) {
-            if (b < 1024) return b + " B";
-            if (b < 1048576) return (b / 1024).toFixed(1) + " KB";
-            return (b / 1048576).toFixed(1) + " MB";
-        }
+        function formatSize(b) { if (b < 1024) return b + " B"; if (b < 1048576) return (b / 1024).toFixed(1) + " KB"; return (b / 1048576).toFixed(1) + " MB"; }
 
         async function openFileEditor(path) {
-            try {
-                const r = await fetch(`${FILES_API}/read?path=${encodeURIComponent(path)}`);
-                const data = await r.json();
-                if (data.error) { showToast(data.error); return; }
-                currentFilePath = path;
-                editorFileName.textContent = path;
-                editorContent.value = data.content;
-                editorMode = "edit";
-                editorContent.classList.remove("hidden");
-                editorPreview.classList.remove("active");
-                editorPreview.innerHTML = "";
-                editorToggleView.textContent = "Preview";
-                fileEditorOverlay.classList.add("active");
-            } catch { showToast("Error opening file"); }
+            try { const r = await fetch(`${FILES_API}/read?path=${encodeURIComponent(path)}`); const data = await r.json(); if (data.error) { showToast(data.error); return; } currentFilePath = path; editorFileName.textContent = path; editorMode = "edit"; const cmContainer = document.getElementById("editorCm"); cmContainer.classList.remove("hidden"); editorContent.classList.add("hidden"); editorPreview.classList.remove("active"); editorPreview.innerHTML = ""; editorToggleView.textContent = "Preview"; initCodeMirror(data.content, data.ext || ""); fileEditorOverlay.classList.add("active"); } catch { showToast("Error opening file"); }
         }
 
         editorClose.addEventListener("click", () => fileEditorOverlay.classList.remove("active"));
         fileEditorOverlay.addEventListener("click", (e) => { if (e.target === fileEditorOverlay) fileEditorOverlay.classList.remove("active"); });
-
-        editorSave.addEventListener("click", async () => {
-            if (!currentFilePath) return;
-            try {
-                const r = await fetch(`${FILES_API}/write`, {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({path: currentFilePath, content: editorContent.value})
-                });
-                const d = await r.json();
-                if (d.error) { showToast(d.error); return; }
-                showToast("Saved");
-                loadFiles(currentDir);
-            } catch { showToast("Save error"); }
-        });
-
-        editorRename.addEventListener("click", async () => {
-            if (!currentFilePath) return;
-            const oldName = currentFilePath.split("/").pop();
-            const newName = prompt("New name:", oldName);
-            if (!newName || newName === oldName) return;
-            try {
-                const r = await fetch(`${FILES_API}/rename`, {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({old_path: currentFilePath, new_name: newName})
-                });
-                const d = await r.json();
-                if (d.error) { showToast(d.error); return; }
-                currentFilePath = d.path;
-                editorFileName.textContent = d.path;
-                showToast("Renamed");
-                loadFiles(currentDir);
-            } catch { showToast("Rename error"); }
-        });
-
-        editorDelete.addEventListener("click", async () => {
-            if (!currentFilePath || !confirm("Delete this file?")) return;
-            try {
-                const r = await fetch(`${FILES_API}/delete`, {
-                    method: "DELETE",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({path: currentFilePath})
-                });
-                const d = await r.json();
-                if (d.error) { showToast(d.error); return; }
-                fileEditorOverlay.classList.remove("active");
-                showToast("Deleted");
-                loadFiles(currentDir);
-            } catch { showToast("Delete error"); }
-        });
-
-        editorToggleView.addEventListener("click", () => {
-            if (editorMode === "edit") {
-                editorMode = "preview";
-                editorContent.classList.add("hidden");
-                editorPreview.classList.add("active");
-                editorPreview.innerHTML = marked.parse(editorContent.value);
-                editorToggleView.textContent = "Edit";
-            } else {
-                editorMode = "edit";
-                editorContent.classList.remove("hidden");
-                editorPreview.classList.remove("active");
-                editorToggleView.textContent = "Preview";
-            }
-        });
-
-        editorContent.addEventListener("keydown", (e) => {
-            if (e.key === "Tab") {
-                e.preventDefault();
-                const s = editorContent.selectionStart;
-                const end = editorContent.selectionEnd;
-                editorContent.value = editorContent.value.substring(0, s) + "    " + editorContent.value.substring(end);
-                editorContent.selectionStart = editorContent.selectionEnd = s + 4;
-            }
-            if (e.key === "s" && (e.ctrlKey || e.metaKey)) {
-                e.preventDefault();
-                editorSave.click();
-            }
-        });
-
-        filesNewFile.addEventListener("click", async () => {
-            const name = prompt("File name (e.g. script.py):");
-            if (!name) return;
-            const path = currentDir ? currentDir + "/" + name : name;
-            try {
-                const r = await fetch(`${FILES_API}/write`, {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({path, content: ""})
-                });
-                const d = await r.json();
-                if (d.error) { showToast(d.error); return; }
-                showToast("Created");
-                loadFiles(currentDir);
-                openFileEditor(d.path);
-            } catch { showToast("Error"); }
-        });
-
-        filesNewFolder.addEventListener("click", async () => {
-            const name = prompt("Folder name:");
-            if (!name) return;
-            const path = currentDir ? currentDir + "/" + name : name;
-            try {
-                const r = await fetch(`${FILES_API}/mkdir`, {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({path})
-                });
-                const d = await r.json();
-                if (d.error) { showToast(d.error); return; }
-                showToast("Created");
-                loadFiles(currentDir);
-            } catch { showToast("Error"); }
-        });
-
+        editorSave.addEventListener("click", async () => { if (!currentFilePath) return; const content = cmEditor ? cmEditor.getValue() : editorContent.value; try { const r = await fetch(`${FILES_API}/write`, { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({path: currentFilePath, content}) }); const d = await r.json(); if (d.error) { showToast(d.error); return; } showToast("Saved"); loadFiles(currentDir); } catch { showToast("Save error"); } });
+        editorRename.addEventListener("click", async () => { if (!currentFilePath) return; const oldName = currentFilePath.split("/").pop(); const newName = prompt("New name:", oldName); if (!newName || newName === oldName) return; try { const r = await fetch(`${FILES_API}/rename`, { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({old_path: currentFilePath, new_name: newName}) }); const d = await r.json(); if (d.error) { showToast(d.error); return; } currentFilePath = d.path; editorFileName.textContent = d.path; showToast("Renamed"); loadFiles(currentDir); } catch { showToast("Rename error"); } });
+        editorDelete.addEventListener("click", async () => { if (!currentFilePath || !confirm("Delete this file?")) return; try { const r = await fetch(`${FILES_API}/delete`, { method: "DELETE", headers: {"Content-Type": "application/json"}, body: JSON.stringify({path: currentFilePath}) }); const d = await r.json(); if (d.error) { showToast(d.error); return; } fileEditorOverlay.classList.remove("active"); showToast("Deleted"); loadFiles(currentDir); } catch { showToast("Delete error"); } });
+        editorToggleView.addEventListener("click", () => { const cmContainer = document.getElementById("editorCm"); if (editorMode === "edit") { editorMode = "preview"; cmContainer.classList.add("hidden"); editorContent.classList.add("hidden"); editorPreview.classList.add("active"); const content = cmEditor ? cmEditor.getValue() : editorContent.value; editorPreview.innerHTML = marked.parse(content); editorToggleView.textContent = "Edit"; } else { editorMode = "edit"; cmContainer.classList.remove("hidden"); editorContent.classList.add("hidden"); editorPreview.classList.remove("active"); editorToggleView.textContent = "Preview"; if (cmEditor) setTimeout(() => cmEditor.refresh(), 10); } });
+        editorContent.addEventListener("keydown", (e) => { if (e.key === "s" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); editorSave.click(); } });
+        filesNewFile.addEventListener("click", async () => { const name = prompt("File name (e.g. script.py):"); if (!name) return; const path = currentDir ? currentDir + "/" + name : name; try { const r = await fetch(`${FILES_API}/write`, { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({path, content: ""}) }); const d = await r.json(); if (d.error) { showToast(d.error); return; } showToast("Created"); loadFiles(currentDir); openFileEditor(d.path); } catch { showToast("Error"); } });
+        filesNewFolder.addEventListener("click", async () => { const name = prompt("Folder name:"); if (!name) return; const path = currentDir ? currentDir + "/" + name : name; try { const r = await fetch(`${FILES_API}/mkdir`, { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({path}) }); const d = await r.json(); if (d.error) { showToast(d.error); return; } showToast("Created"); loadFiles(currentDir); } catch { showToast("Error"); } });
         filesRefresh.addEventListener("click", () => loadFiles(currentDir));
     </script>
 </body>

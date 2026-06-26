@@ -1,12 +1,13 @@
 {
   "ExpandedNodes": [
     "",
+    "\\clients",
     "\\core",
     "\\interface",
     "\\llm",
     "\\prompt",
     "\\vector"
   ],
-  "SelectedNode": "\\main.py",
+  "SelectedNode": "\\core\\shellApi.py",
   "PreviewInSolutionExplorer": false
 }

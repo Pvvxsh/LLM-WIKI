@@ -9,6 +9,7 @@ from llm.send import (
     generate_with_skills_async,
     generate_stream,
     generate_with_skills_stream,
+    prompt_generate_async,
 )
 from vector.vector import VectorAI
 from vector.web import find_async, get_result
@@ -153,17 +154,47 @@ async def api_search(query: str = Form(...), reasoning: bool = Form(False)):
 
 
 @router.post("/search/stream")
-async def api_search_stream(query: str = Form(...), reasoning: bool = Form(False)):
+async def api_search_stream(
+    query: str = Form(...),
+    reasoning: bool = Form(False),
+    improve_prompt: bool = Form(False),
+):
     async def event_generator():
         try:
+            actual_query = query
+
+            if improve_prompt:
+                yield f"data: {json.dumps({'type': 'improving_prompt'})}\n\n"
+                try:
+                    improved = await prompt_generate_async(query)
+                    if improved:
+                        yield f"data: {json.dumps({'type': 'improved_prompt', 'original': query, 'improved': improved})}\n\n"
+                        actual_query = improved
+                except Exception:
+                    pass
+
+            yield f"data: {json.dumps({'type': 'searching', 'source': 'vector'})}\n\n"
+            yield f"data: {json.dumps({'type': 'searching', 'source': 'web'})}\n\n"
+            yield f"data: {json.dumps({'type': 'searching', 'source': 'wikipedia'})}\n\n"
+
             task = SearchTask()
-            await task.search(query)
+            await task.search(actual_query)
+
+            skill_count = len(task.relevant_skills)
+            web_result = get_result()
+            web_count = len(web_result.get("links", []))
+
+            yield f"data: {json.dumps({'type': 'search_done', 'source': 'vector'})}\n\n"
+            yield f"data: {json.dumps({'type': 'search_done', 'source': 'web', 'results': web_count})}\n\n"
+            yield f"data: {json.dumps({'type': 'search_done', 'source': 'wikipedia'})}\n\n"
+            yield f"data: {json.dumps({'type': 'search_done', 'source': 'skills', 'results': skill_count})}\n\n"
+
             async for chunk in task.generate_answer_stream(reasoning_mode=reasoning):
                 if chunk:
-                    yield f"data: {json.dumps({'content': chunk})}\n\n"
-            yield f"data: {json.dumps({'done': True})}\n\n"
+                    yield f"data: {json.dumps({'type': 'answer_chunk', 'content': chunk})}\n\n"
+            yield f"data: {json.dumps({'type': 'done'})}\n\n"
         except Exception as e:
-            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+            yield f"data: {json.dumps({'type': 'error', 'content': str(e)})}\n\n"
 
     return StreamingResponse(
         event_generator(),
@@ -176,6 +207,48 @@ async def api_search_stream(query: str = Form(...), reasoning: bool = Form(False
     )
 
 
+@router.post("/prompt/improve")
+async def api_prompt_improve(request: dict):
+    query = request.get("query", "").strip()
+    if not query:
+        return JSONResponse(content={"error": "Empty query"}, status_code=400)
+    try:
+        result = await prompt_generate_async(query)
+        return JSONResponse(content={"original": query, "improved": result or query})
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+
+@router.post("/search/web")
+async def api_search_web(request: dict):
+    query = request.get("query", "").strip()
+    if not query:
+        return JSONResponse(content={"error": "Empty query"}, status_code=400)
+    try:
+        await find_async(query, n=5)
+        result = get_result()
+        links = result.get("links", [])
+        texts = result.get("texts", [])
+        cards = []
+        for i, (link, text) in enumerate(zip(links, texts)):
+            title = ""
+            for line in text.split("\n"):
+                line = line.strip()
+                if line and len(line) > 10:
+                    title = line[:120]
+                    break
+            if not title:
+                title = link.split("/")[-1][:100]
+            cards.append({
+                "url": link,
+                "title": title,
+                "snippet": text[:500],
+            })
+        return JSONResponse(content={"results": cards, "query": query})
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+
 @router.get("/health")
 async def health():
     return {"status": "ok", "service": "LLM-Wiki", "skills_count": len(load_skills())}
@@ -184,13 +257,15 @@ async def health():
 @router.post("/agent")
 async def api_agent(request: dict):
     query = request.get("query", "").strip()
+    mode = request.get("mode", "build")
+    history = request.get("history", [])
     if not query:
         return JSONResponse(content={"error": "Empty query"}, status_code=400)
 
     try:
         from core.agent import Agent
-        agent = Agent()
-        result = await agent.run(query)
+        agent = Agent(mode=mode)
+        result = await agent.run(query, mode=mode, history=history)
         return JSONResponse(content=result)
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
@@ -199,25 +274,24 @@ async def api_agent(request: dict):
 @router.post("/agent/stream")
 async def api_agent_stream(request: dict):
     query = request.get("query", "").strip()
+    mode = request.get("mode", "build")
+    history = request.get("history", [])
     if not query:
         async def empty():
-            yield f"data: {json.dumps({'error': 'Empty query'})}\n\n"
+            yield f"data: {json.dumps({'type': 'error', 'content': 'Empty query'})}\n\n"
         return StreamingResponse(empty(), media_type="text/event-stream")
 
     async def event_generator():
         try:
             from core.agent import Agent
-            agent = Agent()
-            result = await agent.run(query)
-            answer = result.get("answer", "")
-            actions = result.get("actions", [])
-            yield f"data: {json.dumps({'answer': answer, 'actions': actions}, ensure_ascii=False)}\n\n"
-            yield f"data: {json.dumps({'done': True})}\n\n"
+            agent = Agent(mode=mode)
+            async for event in agent.run_stream(query, mode=mode, history=history):
+                yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
         except Exception as e:
-            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+            yield f"data: {json.dumps({'type': 'error', 'content': str(e)})}\n\n"
 
     return StreamingResponse(
         event_generator(),
         media_type="text/event-stream",
-        headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
+        headers={"Cache-Control": "no-cache", "Connection": "keep-alive", "X-Accel-Buffering": "no"},
     )

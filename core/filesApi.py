@@ -1,6 +1,6 @@
 import os
 import shutil
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 from fastapi import APIRouter, Query
 from fastapi.responses import JSONResponse
@@ -12,18 +12,18 @@ router = APIRouter(prefix="/api/files")
 
 def safe_path(p):
     p = str(p or "").replace("\\", "/").strip("/")
-    full = (BASE_DIR / p).resolve()
-    if not str(full).startswith(str(BASE_DIR.resolve())):
-        return None
-    return full
+    if not p:
+        return Path("C:/")
+    if len(p) == 2 and p[1] == ":":
+        return Path(p + "/")
+    return Path(p)
 
 
-def file_info(path, base):
-    rel = path.relative_to(base)
+def file_info(path):
     is_dir = path.is_dir()
     return {
         "name": path.name,
-        "path": str(rel).replace("\\", "/"),
+        "path": str(path).replace("\\", "/"),
         "type": "dir" if is_dir else "file",
         "size": 0 if is_dir else path.stat().st_size,
         "ext": "" if is_dir else path.suffix.lower(),
@@ -33,7 +33,7 @@ def file_info(path, base):
 @router.get("/tree")
 async def file_tree(path: str = Query("", alias="path")):
     target = safe_path(path)
-    if not target or not target.exists():
+    if not target.exists():
         return JSONResponse(content={"error": "Path not found"}, status_code=404)
     if not target.is_dir():
         return JSONResponse(content={"error": "Not a directory"}, status_code=400)
@@ -43,11 +43,11 @@ async def file_tree(path: str = Query("", alias="path")):
         for item in sorted(target.iterdir(), key=lambda x: (not x.is_dir(), x.name.lower())):
             if item.name.startswith(".") or item.name == "__pycache__":
                 continue
-            items.append(file_info(item, BASE_DIR))
+            items.append(file_info(item))
     except PermissionError:
         return JSONResponse(content={"error": "Access denied"}, status_code=403)
 
-    return JSONResponse(content={"path": str(target.relative_to(BASE_DIR)).replace("\\", "/"), "items": items})
+    return JSONResponse(content={"path": str(target).replace("\\", "/"), "items": items})
 
 
 @router.get("/read")
@@ -64,7 +64,7 @@ async def file_read(path: str = Query(..., alias="path")):
         return JSONResponse(content={"error": "Access denied"}, status_code=403)
 
     return JSONResponse(content={
-        "path": str(target.relative_to(BASE_DIR)).replace("\\", "/"),
+        "path": str(target).replace("\\", "/"),
         "content": content,
         "size": target.stat().st_size,
         "ext": target.suffix.lower(),
@@ -85,7 +85,7 @@ async def file_write(request: dict):
     except PermissionError:
         return JSONResponse(content={"error": "Access denied"}, status_code=403)
 
-    return JSONResponse(content={"status": "ok", "path": str(target.relative_to(BASE_DIR)).replace("\\", "/")})
+    return JSONResponse(content={"status": "ok", "path": str(target).replace("\\", "/")})
 
 
 @router.post("/mkdir")
@@ -102,7 +102,7 @@ async def file_mkdir(request: dict):
     except PermissionError:
         return JSONResponse(content={"error": "Access denied"}, status_code=403)
 
-    return JSONResponse(content={"status": "ok", "path": str(target.relative_to(BASE_DIR)).replace("\\", "/")})
+    return JSONResponse(content={"status": "ok", "path": str(target).replace("\\", "/")})
 
 
 @router.delete("/delete")
@@ -111,7 +111,7 @@ async def file_delete(request: dict):
     target = safe_path(path)
     if not target or not target.exists():
         return JSONResponse(content={"error": "Not found"}, status_code=404)
-    if str(target) == str(BASE_DIR):
+    if str(target) == "C:\\" or str(target) == "C:/":
         return JSONResponse(content={"error": "Cannot delete root"}, status_code=400)
 
     try:
@@ -145,7 +145,7 @@ async def file_rename(request: dict):
     except PermissionError:
         return JSONResponse(content={"error": "Access denied"}, status_code=403)
 
-    return JSONResponse(content={"status": "ok", "path": str(new_target.relative_to(BASE_DIR)).replace("\\", "/")})
+    return JSONResponse(content={"status": "ok", "path": str(new_target).replace("\\", "/")})
 
 
 @router.post("/search")

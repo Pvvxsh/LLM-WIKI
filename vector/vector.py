@@ -62,3 +62,83 @@ class VectorAI:
         )
 
         return resp.json()["choices"][0]["message"]["content"]
+
+
+_vector_instance = None
+_sbert_instance = None
+_mxbai_instance = None
+
+
+def get_vector_ai():
+    global _vector_instance
+    if _vector_instance is None:
+        _vector_instance = VectorAI()
+    return _vector_instance
+
+
+def get_vector_sbert():
+    global _sbert_instance
+    if _sbert_instance is None:
+        try:
+            from vector.vector_sbert import VectorSBERT
+            _sbert_instance = VectorSBERT()
+        except Exception:
+            return None
+    return _sbert_instance
+
+
+def get_vector_mxbai():
+    global _mxbai_instance
+    if _mxbai_instance is None:
+        try:
+            from vector.vector_mxbai import VectorMxBai
+            _mxbai_instance = VectorMxBai()
+        except Exception:
+            return None
+    return _mxbai_instance
+
+
+async def search_all_vectors(question):
+    results = {}
+
+    async def _bge():
+        try:
+            ai = get_vector_ai()
+            return ai.ask(question)
+        except Exception:
+            return ""
+
+    async def _sbert():
+        try:
+            ai = get_vector_sbert()
+            if ai:
+                return ai.ask(question)
+            return ""
+        except Exception:
+            return ""
+
+    async def _mxbai():
+        try:
+            ai = get_vector_mxbai()
+            if ai:
+                return ai.ask(question)
+            return ""
+        except Exception:
+            return ""
+
+    bge_r, sbert_r, mxbai_r = await asyncio.gather(
+        _bge(), _sbert(), _mxbai(), return_exceptions=False
+    )
+
+    parts = []
+    if bge_r:
+        parts.append(f"[BGE] {bge_r}")
+    if sbert_r:
+        parts.append(f"[SBERT] {sbert_r}")
+    if mxbai_r:
+        parts.append(f"[MxBai] {mxbai_r}")
+
+    return "\n".join(parts)
+
+
+import asyncio

@@ -5,6 +5,7 @@ httpx
 python-dotenv
 qdrant-client
 fastembed
+sentence-transformers
 beautifulsoup4
 googlesearch-python
 ddgs

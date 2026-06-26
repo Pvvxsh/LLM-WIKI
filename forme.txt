@@ -1,0 +1,13 @@
+cs-frontend-engineer				frontend_decision_engine.py	Выбор фреймворка
+senior-frontend					frontend_scaffolder.py	Создание проекта
+senior-frontend					component_generator.py	Генерация компонентов
+senior-frontend					bundle_analyzer.py	Анализ бандла
+tailwind-integration				CSS + config	Настройка Tailwind
+component-patterns				Паттерны	Организация кода
+product-ui-patterns				UI паттерны	Продакт-фичи
+component-specs					Спецификации	Типизация
+component-tokens				Токены	Дизайн-система
+tailwind-customization				Кастомизация	Стилизация
+design	Vellum					Готовый дизайн
+frontend_best_practices				Best Practices	Качество кода
+cs-frontend-review				Review gate	Перед пушем
